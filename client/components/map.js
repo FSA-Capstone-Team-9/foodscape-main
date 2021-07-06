@@ -5,7 +5,10 @@ import React, { useRef, useEffect, useState } from 'react';
 
 import mapboxgl from '!mapbox-gl';
 
-// TODO add mapbox api key here
+// dotenv-webpack gets token from environment variable 
+const mapboxToken = process.env.MAPBOX_TOKEN
+mapboxgl.accessToken = mapboxToken
+
 
 export default function Map() {
 
