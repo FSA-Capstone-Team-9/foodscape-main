@@ -2,6 +2,7 @@ import React from "react"
 import { HELLO } from "./hooks/queries"
 import { useQuery } from "@apollo/client"
 import { ApolloProvider, ApolloClient, InMemoryCache } from "@apollo/client"
+import Map from "./components/map"
 
 export const client = new ApolloClient({
     // options go here
@@ -15,7 +16,8 @@ const App = () => {
     // console.log(world)
     return (
         <ApolloProvider client={client}>
-            <div>sup</div>
+            <h1>Sup World</h1>
+            <Map />
         </ApolloProvider>
     )
 }
