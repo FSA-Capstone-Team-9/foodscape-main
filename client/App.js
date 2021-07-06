@@ -16,7 +16,6 @@ const App = () => {
     // console.log(world)
     return (
         <ApolloProvider client={client}>
-            <h1>Sup World</h1>
             <Map />
         </ApolloProvider>
     )
