@@ -1,5 +1,7 @@
 import { gql } from "@apollo/client"
 
-//GET
-
-
+export const HELLO = gql`
+    query {
+        hello
+    }
+`
