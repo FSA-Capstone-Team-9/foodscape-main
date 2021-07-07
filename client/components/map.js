@@ -1,8 +1,4 @@
 import React, { useRef, useEffect, useState } from 'react';
-// TODO
-// import 'mapbox-gl/dist/mapbox-gl.css';
-// import '../../public/style.css';
-
 import mapboxgl from '!mapbox-gl';
 import axios from 'axios';
 
