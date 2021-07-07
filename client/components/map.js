@@ -42,6 +42,16 @@ export default function Map() {
       center: [lng, lat],
       zoom: zoom,
     });
+
+    map.current.addControl(
+        new mapboxgl.GeolocateControl({
+        positionOptions: {
+        enableHighAccuracy: true
+        },
+        trackUserLocation: true
+        })
+        );
+
   });
 
   return (
