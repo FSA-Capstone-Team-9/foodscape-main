@@ -40,7 +40,8 @@ useEffect(() => {
       });
     } 
     
-    // if (map.current) return; // initialize map only once
+    // TODO decide if we want to initialize map only once 
+    // if (map.current) return; 
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
@@ -57,6 +58,14 @@ useEffect(() => {
         trackUserLocation: true,
       })
     );
+
+    // search bar with geocoder
+    map.current.addControl(
+      new MapboxGeocoder({
+      accessToken: mapboxgl.accessToken,
+      mapboxgl: mapboxgl
+      })
+      );
   });
 
   return (
