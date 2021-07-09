@@ -1,10 +1,9 @@
 import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from '!mapbox-gl';
 import axios from 'axios';
-import {MAPBOX_TOKEN} from '../../secrets'
 
 // dotenv-webpack gets token from environment variable
-const mapboxToken = MAPBOX_TOKEN;
+const mapboxToken = process.env.MAPBOX_TOKEN;
 mapboxgl.accessToken = mapboxToken;
 
 export default function Map() {

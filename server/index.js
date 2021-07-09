@@ -10,6 +10,10 @@ const typeDefs = require("./typeDefs")
 const server = new ApolloServer({ typeDefs, resolvers })
 const app = express()
 
+// For Heroku - Only require dotenv when NODE_ENV is set to development
+if (process.env.NODE_ENV == 'development')
+require('dotenv').config({ silent: true });
+
 //utilize express as middleware for the server
 server.applyMiddleware({ app })
 

@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack -w",
     "build:dev": "npm run build -- --watch --mode=development",
+    "heroku-postbuild": "webpack --config webpack.prod.js",
     "seed": "node script/seed.js",
     "start": "node server",
     "start:dev": "npm run build:dev & npm run start-server",
