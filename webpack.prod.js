@@ -26,7 +26,9 @@ module.exports = {
   },
   plugins: [
     new webpack.DefinePlugin({
-      "process.env": {},
-    }),
+      'process.env': {
+        'MAPBOX_TOKEN': JSON.stringify(process.env.MAPBOX_TOKEN),
+      }
+    })
   ],
 }
