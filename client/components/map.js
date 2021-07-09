@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-import { TextField } from '@material-ui/core'
+import { TextField, Toolbar, AppBar } from '@material-ui/core'
 
 import mapboxgl from '!mapbox-gl';
 import axios from 'axios';
@@ -64,6 +64,7 @@ useEffect(() => {
 
   return (
     <div>
+        <AppBar position="fixed"><TextField id="filled-basic">Search</TextField></AppBar>
       <div ref={mapContainer} className="map-container" />
     </div>
   );
