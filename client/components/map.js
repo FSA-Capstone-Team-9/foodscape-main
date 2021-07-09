@@ -67,12 +67,16 @@ useEffect(() => {
       });
 
     // search bar with geocoder
-    map.current.addControl(
-      new MapboxGeocoder({
-      accessToken: mapboxgl.accessToken,
-      mapboxgl: mapboxgl
+    const searchBar = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    mapboxgl: mapboxgl
+    })
+    map.current.addControl(searchBar);
+    // console logs search bar results including full address and coordinates
+    searchBar.on('result', function(event) {
+      console.log('result happened. here is event -->', event.result)
       })
-      );
+
   });
 
   return (
