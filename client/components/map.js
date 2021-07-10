@@ -24,6 +24,10 @@ export default function Map() {
                 properties: {
                     title: business.name,
                     rating: business.rating,
+
+                    popoverDescription: `<h2>${business.name}</h2><p>Did you know that 1 out of 100 Albanians are actually Joshuas?</p>
+                    <h3>${business.distance}mi</h3>`,
+
                     price: business.price,
                     id: business.id,
                     distance: business.distance,
@@ -108,7 +112,7 @@ export default function Map() {
         })
         map.current.on("click", "restaurants", function (e) {
             var coordinates = e.features[0].geometry.coordinates.slice()
-            var title = e.features[0].properties.title
+            var popoverDescription = e.features[0].properties.popoverDescription
 
             // Ensure that if the map is zoomed out such that multiple
             // copies of the feature are visible, the popup appears
@@ -116,11 +120,11 @@ export default function Map() {
             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
             }
-            console.log("hi ive been clicked")
+
             new mapboxgl.Popup()
-                // .setLngLat(coordinates)
-                .setHTML(title)
-                .addTo(map)
+                .setLngLat(coordinates)
+                .setHTML(popoverDescription)
+                .addTo(map.current)
         })
         map.current.on("load", function () {
             console.log("transformed", transformJSON(data))
@@ -156,5 +160,3 @@ export default function Map() {
         </div>
     )
 }
-
-
