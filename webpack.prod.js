@@ -1,10 +1,10 @@
-const Dotenv = require("dotenv-webpack");
+const webpack = require("webpack");
 
 module.exports = {
   entry: [
     './client/index.js'
   ],
-  mode: "development",
+  mode: 'production',
   output: {
     path: __dirname,
     filename: './public/bundle.js'
@@ -24,5 +24,11 @@ module.exports = {
       }
     ]
   },
-  plugins: [new Dotenv()],
+  plugins: [
+    new webpack.DefinePlugin({
+      'process.env': {
+        'MAPBOX_TOKEN': JSON.stringify(process.env.MAPBOX_TOKEN),
+      }
+    })
+  ]
 }
