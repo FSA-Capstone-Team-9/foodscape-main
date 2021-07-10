@@ -18,9 +18,16 @@
 
 // searching("NYC");
 
+/*
+
 // Yelp Fusion Module
-const yelp = require("yelp-fusion");
 require("dotenv").config();
+const yelp = require("yelp-fusion");
+
+//const express = require("express")
+// const app =  express();
+
+// app.use(express.json());
 
 const YELP_API_KEY = process.env.YELP_API_KEY;
 const client = yelp.client(YELP_API_KEY);
@@ -31,9 +38,20 @@ const searchRequest = {
   location: "new york, ny",
 };
 
+app.get("/", async (req, res, next) => {
+    try {
+        const results = await client.search(searchRequest);
+        console.log(results);
+    } catch (error) {
+        next(error)
+    }
+})
+
+
+/*
 const searching = async () => {
   try {
-    const results = await client.search(searchRequest);
+    const results = await client.search({searchRequest});
     // sample output
     results.jsonBody.businesses.forEach((result) => console.log(result.name));
   } catch (error) {
@@ -42,3 +60,4 @@ const searching = async () => {
 };
 
 searching();
+*/
