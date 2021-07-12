@@ -6,6 +6,7 @@
   "scripts": {
     "build": "webpack -w",
     "build:dev": "npm run build -- --watch --mode=development",
+    "heroku-postbuild": "webpack --config webpack.prod.js",
     "seed": "node script/seed.js",
     "start": "node server",
     "start:dev": "npm run build:dev & npm run start-server",
@@ -48,6 +49,7 @@
     "axios": "^0.21.1",
     "graphql": "^15.5.1",
     "nodemon": "^2.0.9",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "yelp-fusion": "^3.0.0"
   }
 }
