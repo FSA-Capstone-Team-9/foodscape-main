@@ -46,15 +46,15 @@ export default function Map() {
     return geoJSONBusinesses;
   }
   async function getRestaurants(coordinates) {
-    const searchRequest = {
-      term: "food",
-      latitude: coordinates[1],
-      longitude: coordinates[0],
-      radius: 4000,
-    };
     try {
+      const searchRequest = {
+        term: "food",
+        latitude: coordinates[1],
+        longitude: coordinates[0],
+        radius: 4000,
+      };
       const { data } = await axios.post("/api/yelp", searchRequest);
-      restaurants = data;
+      return data;
     } catch (error) {
       console.log(error);
     }
@@ -106,7 +106,7 @@ export default function Map() {
     // event.result = search bar results including full address and coordinates
     // event.result.center = [longitude, latitude]
     searchBar.on("result", function (event) {
-      getRestaurants(event.result.center);
+      restaurants = getRestaurants(event.result.center);
     });
     // Fullscreen control
     map.current.addControl(new mapboxgl.FullscreenControl());
