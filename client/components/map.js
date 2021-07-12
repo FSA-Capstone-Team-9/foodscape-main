@@ -19,6 +19,13 @@ export default function Map() {
         console.log(restaurants)
         const geoJSONBusinesses = restaurants.map(business => {
             //Map over businesses here
+            let price = 0
+            if (business.price) {
+                price = business.price.length
+            }
+            //convert meters to miles jackass
+            let meters = Math.floor(business.distance)
+            let distance = (meters / 1609.344).toFixed(1)
             return {
                 type: "Feature",
                 properties: {
@@ -27,13 +34,13 @@ export default function Map() {
 
                     // popover formatting
                     popoverDescription: `<h2>${business.name}</h2>
-                    <img src="${business.businessUrl}"></img>
-                    <h3>Distance: ${business.distance}m</h3>
-                    <h5>Price: ${business.price}</h5>
-                    <h5>Rating: ${business.rating}</h5>
+                    <img src="${business.image_url}" />
+                    <h3>Distance: ${distance}mi</h3>
+                    <h4>Price: ${business.price}</h4>
+                    <h4>Rating: ${business.rating}</h4>
                     `,
 
-                    price: business.price,
+                    price: price,
                     id: business.id,
                     distance: business.distance,
                     url: business.url,
@@ -111,7 +118,7 @@ export default function Map() {
             const lat = event.coords.latitude
             const position = [lng, lat]
             restaurants = await getRestaurants(position)
-            console.log('test', restaurants)
+            console.log("test", restaurants)
             setSourceData()
         })
 
@@ -127,12 +134,12 @@ export default function Map() {
 
         // Searchbar control
         map.current.addControl(searchBar)
-        searchBar.on("result", async function  (event) {
+        searchBar.on("result", async function (event) {
             restaurants = await getRestaurants(event.result.center)
             // After searching, set new source data
             setSourceData()
-        // event.result = search bar results including full address and coordinates
-        // event.result.center = [longitude, latitude]
+            // event.result = search bar results including full address and coordinates
+            // event.result.center = [longitude, latitude]
         })
 
         // Fullscreen control
@@ -178,8 +185,6 @@ export default function Map() {
 
         // On Map load
         map.current.on("load", function () {
-
-
             map.current.addSource("restaurants", {
                 type: "geojson",
                 data: {
@@ -189,25 +194,101 @@ export default function Map() {
             })
 
             // Add layer to draw circles using restaurant source data points
+
+            var rating1 = ["<", ["get", "rating"], 3]
+            var rating2 = [
+                "all",
+                [">=", ["get", "rating"], 3],
+                ["<", ["get", "rating"], 3.5],
+            ]
+            var rating3 = [
+                "all",
+                [">=", ["get", "rating"], 3.5],
+                ["<", ["get", "rating"], 4],
+            ]
+            var rating4 = [
+                "all",
+                [">=", ["get", "rating"], 4],
+                ["<", ["get", "rating"], 4.5],
+            ]
+            var rating5 = [">=", ["get", "rating"], 4.5]
+
+            // colors to use for the categories
+            var colors = ["#eb3434", "#eb3434", "#eb9c34", "#e8eb34", "#00ff00"]
+
             map.current.addLayer({
                 id: "restaurants",
                 type: "circle",
                 source: "restaurants",
                 // minzoom: 14,
                 paint: {
-                    "circle-color": "#00ff00", // Set this equal to price
-                    "circle-radius": {
-                        'base': 1.75,
-                        'stops': [
-                            [12, 10],
-                            [22, 180]
-                        ]
-                    }, // Set this equal to rating
-                    "circle-stroke-width": .6,
+                    "circle-color":
+                        // [
+                        //     "match",
+                        //     ["get", "price"],
+                        //     "$",
+                        //     colors[4],
+                        //     "$$",
+                        //     colors[3],
+                        //     "$$$",
+                        //     colors[2],
+                        //     "$$$$",
+                        //     colors[1],
+                        //     /* other */ "#000000",
+                        // ],
+                        [
+                            "case",
+                            rating1,
+                            colors[0],
+                            rating2,
+                            colors[1],
+                            rating3,
+                            colors[2],
+                            rating4,
+                            colors[3],
+                            colors[4],
+                        ],
+                    "circle-radius":
+                        // {
+                        [
+                            "step",
+                            ["get", "price"],
+                            10,
+                            1,
+                            20,
+                            2,
+                            30,
+                            3,
+                            40,
+                            4,
+                            5,
+                        ],
+                    // [
+                    //     "step",
+                    //     ["get", "rating"],
+                    //     10,
+                    //     3,
+                    //     20,
+                    //     3.5,
+                    //     30,
+                    //     4,
+                    //     40,
+                    //     4.5,
+                    //     5,
+                    // ],
+                    //     base: 1.75,
+                    //     stops: [
+                    //         [12, 25],
+                    //         [22, 180],
+                    //     ],
+                    // },
+                    "circle-stroke-width": 1,
                     "circle-stroke-color": "#000000",
                     "circle-opacity": 0.45,
                 },
-                layout: {},
+                layout: {
+                    visibility: "visible",
+                },
             })
         })
     })
@@ -215,7 +296,9 @@ export default function Map() {
     return (
         <div>
             <div ref={mapContainer} className="map-container" />
-         {!window.localStorage.getItem('hasVisited') && <div>Display Tutorial</div>}
+            {!window.localStorage.getItem("hasVisited") && (
+                <div>Display Tutorial</div>
+            )}
         </div>
     )
 }
