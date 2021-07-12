@@ -14,6 +14,7 @@ export default function Map() {
     const [lng, setLng] = useState(-73.9855)
     const [lat, setLat] = useState(40.758)
     const [zoom, setZoom] = useState(15)
+    let [restaurants, setRestaurants] = useState([])
 
     // Function to transform yelp api restaurant data into a GEOJSON
     function transformJSON(businesses) {
@@ -45,7 +46,14 @@ export default function Map() {
         })
         return geoJSONBusinesses
     }
-    function addSourceData(businesses) {}
+
+    function setSourceData() {
+        let newData = transformJSON(restaurants)
+        map.current.getSource("restaurants").setData({
+            type: "FeatureCollection",
+            features: newData,
+        })
+    }
 
     useEffect(() => {
         // initialize map only once
@@ -91,6 +99,16 @@ export default function Map() {
             mapboxgl: mapboxgl,
         })
 
+        // Searchbar control
+        map.current.addControl(searchBar)
+        // event.result = search bar results including full address and coordinates
+        // event.result.center = [longitude, latitude]
+        searchBar.on("result", function (event) {
+            console.log("search bar result data -->", event.result)
+
+            // Get restaurants here
+        })
+
         var scale = new mapboxgl.ScaleControl({
             maxWidth: 150,
             unit: "imperial",
@@ -98,14 +116,6 @@ export default function Map() {
         map.current.addControl(scale)
 
         scale.setUnit("imperial")
-
-        // Searchbar control
-        map.current.addControl(searchBar)
-        // event.result = search bar results including full address and coordinates
-        // event.result.center = [longitude, latitude]
-        searchBar.on("result", function (event) {
-            console.log("search bar result data -->", event.result)
-        })
         // Fullscreen control
         map.current.addControl(new mapboxgl.FullscreenControl())
 
@@ -136,6 +146,13 @@ export default function Map() {
             console.log("longitude>>", lng)
             console.log("latitude>>", lat)
 
+            // let newData = transformJSON(restaurants)
+
+            // map.current.getSource("restaurants").setData({
+            //     type: "FeatureCollection",
+            //     features: newData,
+            // })
+
             new mapboxgl.Popup()
                 .setLngLat(coordinates)
                 .setHTML(popoverDescription)
@@ -158,13 +175,14 @@ export default function Map() {
                 // minzoom: 14,
                 paint: {
                     "circle-color": "#00ff00", // Set this equal to price
-                    "circle-radius": {
-                        base: 1.75,
-                        stops: [
-                            [12, 2],
-                            [22, 180],
-                        ],
-                    }, // Set this equal to rating
+                    "circle-radius": 20,
+                    // "circle-radius": {
+                    //     base: 1.75,
+                    //     stops: [
+                    //         [12, 2],
+                    //         [22, 180],
+                    //     ],
+                    // }, // Set this equal to rating
                     // "circle-stroke-width": 3,
                     // "circle-stroke-color": "#fff",
                     "circle-opacity": 0.7,
@@ -181,9 +199,9 @@ export default function Map() {
                     // "DIN Offc Pro Medium",
                     // "Arial Unicode MS Bold",
                     // ],
-                    "text-field": ["get", "price"],
-                    "text-justify": "auto",
-                    "text-size": 12,
+                    // "text-field": ["get", "price"],
+                    // "text-justify": "auto",
+                    // "text-size": 12,
                 },
             })
         })
