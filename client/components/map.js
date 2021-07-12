@@ -26,7 +26,8 @@ export default function Map() {
                     rating: business.rating,
 
                     popoverDescription: `<h2>${business.name}</h2><p>Did you know that 1 out of 100 Albanians are actually Joshuas?</p>
-                    <h3>${business.distance}mi</h3>`,
+                    <h3>${business.distance}mi</h3>
+                    <h4>${business.price}</h4>`,
 
                     price: business.price,
                     id: business.id,
@@ -44,6 +45,7 @@ export default function Map() {
         })
         return geoJSONBusinesses
     }
+    function addSourceData(businesses) {}
 
     useEffect(() => {
         // initialize map only once
@@ -89,6 +91,14 @@ export default function Map() {
             mapboxgl: mapboxgl,
         })
 
+        var scale = new mapboxgl.ScaleControl({
+            maxWidth: 150,
+            unit: "imperial",
+        })
+        map.current.addControl(scale)
+
+        scale.setUnit("imperial")
+
         // Searchbar control
         map.current.addControl(searchBar)
         // event.result = search bar results including full address and coordinates
@@ -121,14 +131,18 @@ export default function Map() {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
             }
 
+            // access longitude and latitude values directly
+            var { lat, lng } = map.current.getCenter()
+            console.log("longitude>>", lng)
+            console.log("latitude>>", lat)
+
             new mapboxgl.Popup()
                 .setLngLat(coordinates)
                 .setHTML(popoverDescription)
                 .addTo(map.current)
         })
         map.current.on("load", function () {
-            console.log("transformed", transformJSON(data))
-
+            console.log(map.current)
             map.current.addSource("restaurants", {
                 type: "geojson",
                 data: {
@@ -144,12 +158,33 @@ export default function Map() {
                 // minzoom: 14,
                 paint: {
                     "circle-color": "#00ff00", // Set this equal to price
-                    "circle-radius": 20, // Set this equal to rating
+                    "circle-radius": {
+                        base: 1.75,
+                        stops: [
+                            [12, 2],
+                            [22, 180],
+                        ],
+                    }, // Set this equal to rating
                     // "circle-stroke-width": 3,
                     // "circle-stroke-color": "#fff",
                     "circle-opacity": 0.7,
                 },
-                layout: {},
+            })
+            map.current.addLayer({
+                id: "restaurantSymbols",
+                type: "symbol",
+                source: "restaurants",
+                // filter: ["has", "point_count"],
+                layout: {
+                    // "text-field": "{point_count_abbreviated}",
+                    // "text-font": [
+                    // "DIN Offc Pro Medium",
+                    // "Arial Unicode MS Bold",
+                    // ],
+                    "text-field": ["get", "price"],
+                    "text-justify": "auto",
+                    "text-size": 12,
+                },
             })
         })
     })
