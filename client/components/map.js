@@ -2,8 +2,6 @@ import React, { useRef, useEffect, useState } from "react"
 import mapboxgl from "!mapbox-gl"
 import axios from "axios"
 
-import { data } from "../../data"
-console.log(data)
 // dotenv-webpack gets token from environment variable
 const mapboxToken = process.env.MAPBOX_TOKEN
 mapboxgl.accessToken = mapboxToken
@@ -17,23 +15,24 @@ export default function Map() {
     let [restaurants, setRestaurants] = useState([])
 
     // Function to transform yelp api restaurant data into a GEOJSON
-    function transformJSON(businesses) {
-        const geoJSONBusinesses = businesses.map(business => {
-            //Transform here
+    function transformJSON() {
+        console.log(restaurants)
+        const geoJSONBusinesses = restaurants.map(business => {
+            //Map over businesses here
             return {
                 type: "Feature",
                 properties: {
                     title: business.name,
                     rating: business.rating,
 
-                    popoverDescription: `<h2>${business.name}</h2><p>Did you know that 1 out of 100 Albanians are actually Joshuas?</p>
-                    <h3>${business.distance}mi</h3>
-                    <h4>${business.price}</h4>`,
+                    // popover formatting
+                    popoverDescription: `<h2>${business.name}</h2><p>Description Here?</p>
+                    <h3>${business.distance}mi</h3>`,
 
                     price: business.price,
                     id: business.id,
                     distance: business.distance,
-                    url: "https://www.yelp.com/biz/celestine-brooklyn?adjust_creative=lXwNMOnoO3qbv5EBsmc8vA&utm_campaign=yelp_api_v3&utm_medium=api_v3_business_search&utm_source=lXwNMOnoO3qbv5EBsmc8vA",
+                    url: business.url,
                 },
                 geometry: {
                     type: "Point",
@@ -47,8 +46,27 @@ export default function Map() {
         return geoJSONBusinesses
     }
 
+    // get yelp restaurant data
+    // TODO - Does this need other paramters?
+    async function getRestaurants(coordinates) {
+        try {
+            const searchRequest = {
+                term: "food",
+                latitude: coordinates[1],
+                longitude: coordinates[0],
+                radius: 4000,
+            }
+            const { data } = await axios.post("/api/yelp", searchRequest)
+            return data
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    // Set data source to include new restaurant data
     function setSourceData() {
-        let newData = transformJSON(restaurants)
+        let newData = transformJSON()
+        console.log(newData)
         map.current.getSource("restaurants").setData({
             type: "FeatureCollection",
             features: newData,
@@ -56,6 +74,7 @@ export default function Map() {
     }
 
     useEffect(() => {
+        console.log(hasVisited)
         // initialize map only once
         if (map.current) return
         map.current = new mapboxgl.Map({
@@ -79,16 +98,17 @@ export default function Map() {
         map.current.on("load", function () {
             geolocate.trigger()
         })
-        // after geolocate triggers on load, console log coordinates
-        geolocate.once("geolocate", function (event) {
+        // after geolocate triggers on load, get new restaurant data and transform
+        // current dataset
+        geolocate.once("geolocate", async function (event) {
             const lng = event.coords.longitude
             const lat = event.coords.latitude
             const position = [lng, lat]
-            console.log(
-                "after geolocate trigger on load, position is -->",
-                position
-            )
+            restaurants = await getRestaurants(position)
+            console.log('test', restaurants)
+            setSourceData()
         })
+
         // Use this to determine window size
         // console.log("width:", window.innerWidth)
         // console.log("height:", window.innerHeight)
@@ -101,27 +121,29 @@ export default function Map() {
 
         // Searchbar control
         map.current.addControl(searchBar)
+        searchBar.on("result", async function  (event) {
+            restaurants = await getRestaurants(event.result.center)
+            // After searching, set new source data
+            setSourceData()
         // event.result = search bar results including full address and coordinates
         // event.result.center = [longitude, latitude]
-        searchBar.on("result", function (event) {
-            console.log("search bar result data -->", event.result)
-
-            // Get restaurants here
         })
 
-        var scale = new mapboxgl.ScaleControl({
-            maxWidth: 150,
-            unit: "imperial",
-        })
-        map.current.addControl(scale)
-
-        scale.setUnit("imperial")
         // Fullscreen control
         map.current.addControl(new mapboxgl.FullscreenControl())
 
         // Navigation control
         map.current.addControl(new mapboxgl.NavigationControl())
 
+        // Scale legend
+        var scale = new mapboxgl.ScaleControl({
+            maxWidth: 150,
+            unit: "imperial",
+        })
+        map.current.addControl(scale)
+        scale.setUnit("imperial")
+
+        // Mouse pointer functionality - onmouseenter, change cursor
         map.current.on("mouseenter", "restaurants", function () {
             map.current.getCanvas().style.cursor = "pointer"
         })
@@ -130,6 +152,7 @@ export default function Map() {
         map.current.on("mouseleave", "restaurants", function () {
             map.current.getCanvas().style.cursor = ""
         })
+        // OnClick functionality - open popup
         map.current.on("click", "restaurants", function (e) {
             var coordinates = e.features[0].geometry.coordinates.slice()
             var popoverDescription = e.features[0].properties.popoverDescription
@@ -141,33 +164,25 @@ export default function Map() {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
             }
 
-            // access longitude and latitude values directly
-            var { lat, lng } = map.current.getCenter()
-            console.log("longitude>>", lng)
-            console.log("latitude>>", lat)
-
-            // let newData = transformJSON(restaurants)
-
-            // map.current.getSource("restaurants").setData({
-            //     type: "FeatureCollection",
-            //     features: newData,
-            // })
-
             new mapboxgl.Popup()
                 .setLngLat(coordinates)
                 .setHTML(popoverDescription)
                 .addTo(map.current)
         })
+
+        // On Map load
         map.current.on("load", function () {
-            console.log(map.current)
+
+
             map.current.addSource("restaurants", {
                 type: "geojson",
                 data: {
                     type: "FeatureCollection",
-                    features: transformJSON(data),
+                    features: transformJSON(),
                 },
             })
 
+            // Add layer to draw circles using restaurant source data points
             map.current.addLayer({
                 id: "restaurants",
                 type: "circle",
@@ -175,34 +190,12 @@ export default function Map() {
                 // minzoom: 14,
                 paint: {
                     "circle-color": "#00ff00", // Set this equal to price
-                    "circle-radius": 20,
-                    // "circle-radius": {
-                    //     base: 1.75,
-                    //     stops: [
-                    //         [12, 2],
-                    //         [22, 180],
-                    //     ],
-                    // }, // Set this equal to rating
+                    "circle-radius": 20, // Set this equal to rating
                     // "circle-stroke-width": 3,
                     // "circle-stroke-color": "#fff",
                     "circle-opacity": 0.7,
                 },
-            })
-            map.current.addLayer({
-                id: "restaurantSymbols",
-                type: "symbol",
-                source: "restaurants",
-                // filter: ["has", "point_count"],
-                layout: {
-                    // "text-field": "{point_count_abbreviated}",
-                    // "text-font": [
-                    // "DIN Offc Pro Medium",
-                    // "Arial Unicode MS Bold",
-                    // ],
-                    // "text-field": ["get", "price"],
-                    // "text-justify": "auto",
-                    // "text-size": 12,
-                },
+                layout: {},
             })
         })
     })
@@ -210,6 +203,7 @@ export default function Map() {
     return (
         <div>
             <div ref={mapContainer} className="map-container" />
+         {!window.localStorage.getItem('hasVisited') && <div>Display Tutorial</div>}
         </div>
     )
 }

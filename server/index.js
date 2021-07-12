@@ -14,7 +14,6 @@ const app = express();
 if (process.env.NODE_ENV == "development") {
   require("dotenv").config({ silent: true });
 }
-require("dotenv").config();
 //utilize express as middleware for the server
 //server.applyMiddleware({ app });
 
@@ -23,27 +22,12 @@ app.get("/", (req, res) =>
   res.sendFile(path.join(__dirname, "..", "public/index.html"))
 );
 
+// body-parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const yelp = require("yelp-fusion");
-const YELP_API_KEY = process.env.YELP_API_KEY;
-const client = yelp.client(YELP_API_KEY);
-
-app.post("/", async (req, res, next) => {
-  try {
-    const searchRequest = {
-      term: "food",
-      location: "valhalla, ny",
-      radius: 4000,
-    };
-    const results = await client.search(searchRequest);
-    console.log(req.body);
-    res.json(results);
-  } catch (error) {
-    next(error);
-  }
-});
+// API routes
+app.use("/api", require("./api"));
 
 app.use((err, req, res, next) => {
   if (process.env.NODE_ENV !== "test") console.error(err.stack);
