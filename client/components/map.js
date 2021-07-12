@@ -53,8 +53,8 @@ export default function Map() {
       radius: 4000,
     };
     try {
-      const restaurants = await axios.post("/api/yelp", searchRequest);
-      console.log(restaurants.data);
+      const { data } = await axios.post("/api/yelp", searchRequest);
+      restaurants = data;
     } catch (error) {
       console.log(error);
     }
