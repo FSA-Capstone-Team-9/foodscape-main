@@ -26,8 +26,12 @@ export default function Map() {
                     rating: business.rating,
 
                     // popover formatting
-                    popoverDescription: `<h2>${business.name}</h2><p>Description Here?</p>
-                    <h3>${business.distance}mi</h3>`,
+                    popoverDescription: `<h2>${business.name}</h2>
+                    <img src="${business.businessUrl}"></img>
+                    <h3>Distance: ${business.distance}m</h3>
+                    <h5>Price: ${business.price}</h5>
+                    <h5>Rating: ${business.rating}</h5>
+                    `,
 
                     price: business.price,
                     id: business.id,
@@ -50,8 +54,11 @@ export default function Map() {
     // TODO - Does this need other paramters?
     async function getRestaurants(coordinates) {
         try {
+            //make term string here
+            //const term = ....
             const searchRequest = {
-                term: "food",
+                // Default term = food
+                term: "food, bar, restaurant", // term:term,
                 latitude: coordinates[1],
                 longitude: coordinates[0],
                 radius: 4000,
@@ -74,12 +81,11 @@ export default function Map() {
     }
 
     useEffect(() => {
-        console.log(hasVisited)
         // initialize map only once
         if (map.current) return
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
-            style: "mapbox://styles/mapbox/streets-v11",
+            style: "mapbox://styles/mapbox/light-v10",
             center: [lng, lat],
             zoom: zoom,
         })
@@ -190,10 +196,16 @@ export default function Map() {
                 // minzoom: 14,
                 paint: {
                     "circle-color": "#00ff00", // Set this equal to price
-                    "circle-radius": 20, // Set this equal to rating
-                    // "circle-stroke-width": 3,
-                    // "circle-stroke-color": "#fff",
-                    "circle-opacity": 0.7,
+                    "circle-radius": {
+                        'base': 1.75,
+                        'stops': [
+                            [12, 10],
+                            [22, 180]
+                        ]
+                    }, // Set this equal to rating
+                    "circle-stroke-width": .6,
+                    "circle-stroke-color": "#000000",
+                    "circle-opacity": 0.45,
                 },
                 layout: {},
             })
