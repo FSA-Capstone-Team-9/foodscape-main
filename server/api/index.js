@@ -1,3 +1,12 @@
+const router = require("express").Router();
+module.exports = router;
+router.use("/yelp", require("./yelp"));
+router.use((req, res, next) => {
+  const error = new Error("Not Found");
+  error.status = 404;
+  next(error);
+});
+
 // require("dotenv").config();
 // const YELP_API_KEY = process.env.YELP_API_KEY;
 // const axios = require("axios");
