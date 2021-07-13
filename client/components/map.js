@@ -7,11 +7,10 @@ import SimpleAccordion from "./Accordion"
 import mapboxgl from "!mapbox-gl"
 import axios from "axios"
 
-// dotenv-webpack gets token from environment variable
-const mapboxToken = process.env.MAPBOX_TOKEN
-mapboxgl.accessToken = mapboxToken
-
 export default function Map() {
+    // dotenv-webpack gets token from environment variable
+    mapboxgl.accessToken = process.env.MAPBOX_TOKEN
+
     const mapContainer = useRef(null)
     const map = useRef(null)
     const [lng, setLng] = useState(-73.9855)
@@ -97,8 +96,6 @@ export default function Map() {
     }
 
     useEffect(() => {
-        // initialize map only once
-        if (map.current) return
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
             style: "mapbox://styles/mapbox/light-v10",
@@ -414,7 +411,7 @@ export default function Map() {
                 },
             })
         })
-    })
+    }, [])
 
     function onButtonChange(clickedLayer) {
         map.current.setLayoutProperty(clickedLayer, "visibility", "visible")
