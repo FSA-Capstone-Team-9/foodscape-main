@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 
 import { TextField, Toolbar, AppBar, Button } from '@material-ui/core'
 import SimpleBackdrop from './Backdrop';
-import SwipeableTemporaryDrawer from './Drawer';
+import SimpleAccordion from './Accordion';
 
 import mapboxgl from '!mapbox-gl';
 import axios from 'axios';
@@ -223,8 +223,7 @@ export default function Map() {
             <SimpleBackdrop />
             <Button>Bottom Text</Button>
             <Button>Bottom Text 2</Button>
-            <Button></Button>
-            <SwipeableTemporaryDrawer />
+            <SimpleAccordion />
         </div>
     )
 }
