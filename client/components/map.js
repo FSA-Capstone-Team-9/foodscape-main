@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState } from "react"
 import { TextField, Toolbar, AppBar, Button } from "@material-ui/core"
 import SimpleBackdrop from "./Backdrop"
 import SimpleAccordion from "./Accordion"
+import SearchBar from "./Search-Bar"
 
 import mapboxgl from "!mapbox-gl"
 import axios from "axios"
@@ -479,6 +480,7 @@ export default function Map() {
             {!window.localStorage.getItem("hasVisited") && (
                 <div>Display Tutorial</div>
             )}
+            <SearchBar/>
             <SimpleBackdrop />
             <SimpleAccordion
                 onChange={clickedLayer => onButtonChange(clickedLayer)}
