@@ -1,6 +1,11 @@
-import React, { useRef, useEffect, useState } from "react"
-import mapboxgl from "!mapbox-gl"
-import axios from "axios"
+import React, { useRef, useEffect, useState } from 'react';
+
+import { TextField, Toolbar, AppBar, Button } from '@material-ui/core'
+import SimpleBackdrop from './Backdrop';
+import SimpleAccordion from './Accordion';
+
+import mapboxgl from '!mapbox-gl';
+import axios from 'axios';
 
 // dotenv-webpack gets token from environment variable
 const mapboxToken = process.env.MAPBOX_TOKEN
@@ -215,7 +220,8 @@ export default function Map() {
     return (
         <div>
             <div ref={mapContainer} className="map-container" />
-         {!window.localStorage.getItem('hasVisited') && <div>Display Tutorial</div>}
+            <SimpleBackdrop />
+            <SimpleAccordion />
         </div>
     )
 }
