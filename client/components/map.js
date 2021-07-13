@@ -221,8 +221,6 @@ export default function Map() {
         <div>
             <div ref={mapContainer} className="map-container" />
             <SimpleBackdrop />
-            <Button>Bottom Text</Button>
-            <Button>Bottom Text 2</Button>
             <SimpleAccordion />
         </div>
     )
