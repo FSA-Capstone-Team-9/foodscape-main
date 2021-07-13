@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 
-import { TextField, Toolbar, AppBar } from '@material-ui/core'
+import { TextField, Toolbar, AppBar, Button } from '@material-ui/core'
+import SimpleBackdrop from './Backdrop';
+import SwipeableTemporaryDrawer from './Drawer';
 
 import mapboxgl from '!mapbox-gl';
 import axios from 'axios';
@@ -218,7 +220,11 @@ export default function Map() {
     return (
         <div>
             <div ref={mapContainer} className="map-container" />
-         {!window.localStorage.getItem('hasVisited') && <div>Display Tutorial</div>}
+            <SimpleBackdrop />
+            <Button>Bottom Text</Button>
+            <Button>Bottom Text 2</Button>
+            <Button></Button>
+            <SwipeableTemporaryDrawer />
         </div>
     )
 }
