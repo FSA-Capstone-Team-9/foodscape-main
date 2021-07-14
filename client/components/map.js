@@ -3,25 +3,28 @@ import React, { useRef, useEffect, useState } from "react"
 import { TextField, Toolbar, AppBar, Button } from "@material-ui/core"
 import SimpleBackdrop from "./Backdrop"
 import SimpleAccordion from "./Accordion"
+import SearchBar from "./Search-Bar"
 
 import mapboxgl from "!mapbox-gl"
 import axios from "axios"
 
-// dotenv-webpack gets token from environment variable
-const mapboxToken = process.env.MAPBOX_TOKEN
-mapboxgl.accessToken = mapboxToken
-
 export default function Map() {
+    // dotenv-webpack gets token from environment variable
+    mapboxgl.accessToken = process.env.MAPBOX_TOKEN
+
+    const defaultLng = -73.9855
+    const defaultLat = 40.758
+    const defaultZoom = 15
+
     const mapContainer = useRef(null)
     const map = useRef(null)
-    const [lng, setLng] = useState(-73.9855)
-    const [lat, setLat] = useState(40.758)
-    const [zoom, setZoom] = useState(15)
-    let [restaurants, setRestaurants] = useState([])
+    const [lng, setLng] = useState(defaultLng)
+    const [lat, setLat] = useState(defaultLat)
+    const [firstGeolocate, setFirstGeolocate] = useState(false)
+    let restaurants = []
 
     // Function to transform yelp api restaurant data into a GEOJSON
     function transformJSON() {
-        console.log(restaurants)
         const geoJSONBusinesses = restaurants.map(business => {
             //Map over businesses here
             let price = 0
@@ -61,23 +64,32 @@ export default function Map() {
             }
         })
         return geoJSONBusinesses
+        // [$,$$,$$$,$$$$]
+        // [1, 1, 0, 0]
+        //.filter((r)=>r.properties.price.length===)
         //.sort((a, b) => b.properties.price - a.properties.price)
         //.sort((a, b) => b.properties.rating - a.properties.rating)
+        //.sort((a, b) => b.properties.distance - a.properties.distance)
     }
 
     // get yelp restaurant data
-    // TODO - Does this need other paramters?
-    async function getRestaurants(coordinates) {
+    async function getRestaurants(
+        coordinates,
+        searchTerms = "food",
+        radius = 6000,
+        limit = 20,
+        sort = "best_match",
+        offset = 0
+    ) {
         try {
-            //make term string here
-            //const term = ....
             const searchRequest = {
-                // Default term = food
-                term: "food", // term:term,
+                term: searchTerms,
                 latitude: coordinates[1],
                 longitude: coordinates[0],
-                radius: 4000,
-                limit: 40,
+                radius: 8000,
+                limit: 50,
+                offset: offset,
+                sort_by: "best_match",
             }
             const { data } = await axios.post("/api/yelp", searchRequest)
             return data
@@ -89,7 +101,6 @@ export default function Map() {
     // Set data source to include new restaurant data
     function setSourceData() {
         let newData = transformJSON()
-        console.log(newData)
         map.current.getSource("restaurants").setData({
             type: "FeatureCollection",
             features: newData,
@@ -97,13 +108,11 @@ export default function Map() {
     }
 
     useEffect(() => {
-        // initialize map only once
-        if (map.current) return
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
             style: "mapbox://styles/mapbox/light-v10",
             center: [lng, lat],
-            zoom: zoom,
+            zoom: defaultZoom,
         })
 
         // geolocation button on map
@@ -118,7 +127,10 @@ export default function Map() {
         map.current.addControl(geolocate)
         // trigger geolocation on load if user gives permission
         map.current.on("load", function () {
-            geolocate.trigger()
+            if (!firstGeolocate) {
+                setFirstGeolocate(true)
+                geolocate.trigger()
+            }
         })
         // after geolocate triggers on load, get new restaurant data and transform
         // current dataset
@@ -127,7 +139,6 @@ export default function Map() {
             const lat = event.coords.latitude
             const position = [lng, lat]
             restaurants = await getRestaurants(position)
-            console.log("test", restaurants)
             setSourceData()
         })
 
@@ -141,15 +152,16 @@ export default function Map() {
             mapboxgl: mapboxgl,
         })
 
-        // Searchbar control
-        map.current.addControl(searchBar)
-        searchBar.on("result", async function (event) {
-            restaurants = await getRestaurants(event.result.center)
-            // After searching, set new source data
-            setSourceData()
-            // event.result = search bar results including full address and coordinates
-            // event.result.center = [longitude, latitude]
-        })
+        // default Mapbox searchbar
+        // // Searchbar control
+        // map.current.addControl(searchBar)
+        // searchBar.on("result", async function (event) {
+        //     restaurants = await getRestaurants(event.result.center)
+        //     // After searching, set new source data
+        //     setSourceData()
+        //     // event.result = search bar results including full address and coordinates
+        //     // event.result.center = [longitude, latitude]
+        // })
 
         // Fullscreen control
         map.current.addControl(new mapboxgl.FullscreenControl())
@@ -414,7 +426,7 @@ export default function Map() {
                 },
             })
         })
-    })
+    }, [lat])
 
     function onButtonChange(clickedLayer) {
         map.current.setLayoutProperty(clickedLayer, "visibility", "visible")
@@ -476,16 +488,30 @@ export default function Map() {
         }
     }
 
+    async function handleSearchSubmit(coordinates, searchTerms) {
+        restaurants = await getRestaurants(coordinates, searchTerms)
+        // After searching, set new source data
+        setSourceData()
+        map.current.jumpTo({
+            center: coordinates,
+        })
+    }
+
     return (
         <div>
-            <div ref={mapContainer} className="map-container" />
-            {!window.localStorage.getItem("hasVisited") && (
+            {/* {!window.localStorage.getItem('hasVisited') && (
                 <div>Display Tutorial</div>
-            )}
-            <SimpleBackdrop />
+            )} */}
+            <div ref={mapContainer} className="map-container" />
+            <SearchBar
+                handleSearchSubmit={(coordinates, searchTerms) =>
+                    handleSearchSubmit(coordinates, searchTerms)
+                }
+            />
             <SimpleAccordion
                 onChange={clickedLayer => onButtonChange(clickedLayer)}
             />
+            <SimpleBackdrop />
         </div>
     )
 }

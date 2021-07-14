@@ -15,6 +15,7 @@ import FormLabel from "@material-ui/core/FormLabel"
 const useStyles = makeStyles(theme => ({
     root: {
         width: "10%",
+        margin: 5,
     },
     heading: {
         fontSize: theme.typography.pxToRem(15),
@@ -24,7 +25,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function SimpleAccordion(props) {
     const classes = useStyles()
-    const [value, setValue] = React.useState("female")
+    const [value, setValue] = React.useState("1")
 
     const handleChange = event => {
         setValue(event.target.value)
@@ -32,7 +33,7 @@ export default function SimpleAccordion(props) {
     }
 
     return (
-        <div className={classes.root}>
+        <div className={classes.root} style={{ zIndex: "10" }}>
             <Accordion>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}
