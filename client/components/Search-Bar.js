@@ -64,6 +64,7 @@ export default function SearchBar(props) {
           location
         )}.json?access_token=${process.env.MAPBOX_TOKEN}`
       );
+      console.log('Mapbox Geolocate API results -->', result)
       const coordinates = result.data.features[0].center // [longitude,latitude]
       props.handleSearchSubmit(coordinates, searchTerms)
     } catch (error) {
