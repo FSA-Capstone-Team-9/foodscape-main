@@ -22,10 +22,6 @@ const legendSpan = {
   width: "10px",
 };
 
-const colors = {
-  backgroundColor: "#723122",
-};
-
 export default function legend() {
   return (
     <>
@@ -34,7 +30,7 @@ export default function legend() {
         <div>
           <span
             style={Object.assign({}, legendSpan, {
-              backgroundColor: "#723122",
+              backgroundColor: "#00ff00",
             })}
           ></span>
           4 or higher
@@ -42,7 +38,7 @@ export default function legend() {
         <div>
           <span
             style={Object.assign({}, legendSpan, {
-              backgroundColor: "#723122",
+              backgroundColor: "#e8eb34",
             })}
           ></span>
           4 or higher
@@ -50,7 +46,7 @@ export default function legend() {
         <div>
           <span
             style={Object.assign({}, legendSpan, {
-              backgroundColor: "#723122",
+              backgroundColor: "#eb9c34",
             })}
           ></span>
           4 or higher
@@ -58,7 +54,15 @@ export default function legend() {
         <div>
           <span
             style={Object.assign({}, legendSpan, {
-              backgroundColor: "#723122",
+              backgroundColor: "#eb3434",
+            })}
+          ></span>
+          4 or higher
+        </div>
+        <div>
+          <span
+            style={Object.assign({}, legendSpan, {
+              backgroundColor: "#eb3434",
             })}
           ></span>
           4 or higher
