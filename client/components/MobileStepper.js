@@ -39,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: 400,
     flexGrow: 1,
+    zIndex: 5
   },
   header: {
     display: 'flex',
@@ -54,9 +55,14 @@ const useStyles = makeStyles((theme) => ({
     display: 'block',
     width: '100%',
   },
+  closeButton: {
+    position: 'absolute',
+    right: theme.spacing(1),
+    top: theme.spacing(1),
+    color: theme.palette.grey[500],
 }));
 
-export default function TextMobileStepper() {
+export default function TutorialStepper() {
   const classes = useStyles();
   const theme = useTheme();
   const [activeStep, setActiveStep] = React.useState(0);
