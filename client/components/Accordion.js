@@ -32,7 +32,7 @@ export default function SimpleAccordion(props) {
     }
 
     return (
-        <div className={classes.root}>
+        <div className={classes.root} style={{ zIndex: "10" }}>
             <Accordion>
                 <AccordionSummary
                     expandIcon={<ExpandMoreIcon />}

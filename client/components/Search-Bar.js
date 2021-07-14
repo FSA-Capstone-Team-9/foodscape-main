@@ -21,8 +21,8 @@ export const useStyles = makeStyles(theme => ({
         padding: "2px 4px",
         display: "flex",
         alignItems: "center",
-        width: "600px",
-        margin: "10px",
+        width: 600,
+        margin: 5,
     },
     input: {
         marginLeft: theme.spacing(1),
@@ -68,16 +68,18 @@ export default function SearchBar(props) {
     async function handleSubmit(event) {
         event.preventDefault()
         try {
-            console.log(location)
             const result = await axios.get(
                 `https://api.tiles.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
                     location
                 )}.json?access_token=${process.env.MAPBOX_TOKEN}&country=us`
             )
             console.log("Mapbox Geolocate API results -->", result)
-            console.log("choice", choice)
-            console.log("result:", result.data.features)
-            const coordinates = result.data.features[choice].center // [longitude,latitude]
+            let coordinates = []
+            if (choice === undefined) {
+                coordinates = result.data.features[0].center // [longitude,latitude]
+            } else {
+                coordinates = result.data.features[choice].center // [longitude,latitude]
+            }
             props.handleSearchSubmit(coordinates, searchTerms)
         } catch (error) {
             badSearch()
@@ -138,6 +140,7 @@ export default function SearchBar(props) {
                             value={location}
                             // margin="normal"
                             // variant="outlined"
+                            required={true}
                             InputProps={{
                                 ...params.InputProps,
                                 type: "search",

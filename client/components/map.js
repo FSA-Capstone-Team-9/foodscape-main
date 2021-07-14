@@ -487,10 +487,10 @@ export default function Map() {
 
     return (
         <div>
-            <div ref={mapContainer} className="map-container" />
             {/* {!window.localStorage.getItem('hasVisited') && (
-        <div>Display Tutorial</div>
-      )} */}
+                <div>Display Tutorial</div>
+            )} */}
+            <div ref={mapContainer} className="map-container" />
             <SearchBar
                 handleSearchSubmit={(coordinates, searchTerms) =>
                     handleSearchSubmit(coordinates, searchTerms)
