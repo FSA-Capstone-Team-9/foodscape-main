@@ -12,16 +12,19 @@ export default function Map() {
     // dotenv-webpack gets token from environment variable
     mapboxgl.accessToken = process.env.MAPBOX_TOKEN
 
+    const defaultLng = -73.9855;
+    const defaultLat = 40.758;
+    const defaultZoom = 15
+
     const mapContainer = useRef(null)
     const map = useRef(null)
-    const [lng, setLng] = useState(-73.9855)
-    const [lat, setLat] = useState(40.758)
-    const [zoom, setZoom] = useState(15)
-    let [restaurants, setRestaurants] = useState([])
+    const [lng, setLng] = useState(defaultLng)
+    const [lat, setLat] = useState(defaultLat)
+    const [firstGeolocate, setFirstGeolocate] = useState(false);
+    let restaurants = []
 
     // Function to transform yelp api restaurant data into a GEOJSON
     function transformJSON() {
-        console.log(restaurants)
         const geoJSONBusinesses = restaurants.map(business => {
             //Map over businesses here
             let price = 0
@@ -67,13 +70,10 @@ export default function Map() {
 
     // get yelp restaurant data
     // TODO - Does this need other paramters?
-    async function getRestaurants(coordinates) {
+    async function getRestaurants(coordinates, searchTerms = 'food') {
         try {
-            //make term string here
-            //const term = ....
             const searchRequest = {
-                // Default term = food
-                term: "food", // term:term,
+                term: searchTerms,
                 latitude: coordinates[1],
                 longitude: coordinates[0],
                 radius: 4000,
@@ -89,7 +89,6 @@ export default function Map() {
     // Set data source to include new restaurant data
     function setSourceData() {
         let newData = transformJSON()
-        console.log(newData)
         map.current.getSource("restaurants").setData({
             type: "FeatureCollection",
             features: newData,
@@ -101,7 +100,7 @@ export default function Map() {
             container: mapContainer.current,
             style: "mapbox://styles/mapbox/light-v10",
             center: [lng, lat],
-            zoom: zoom,
+            zoom: defaultZoom,
         })
 
         // geolocation button on map
@@ -116,7 +115,10 @@ export default function Map() {
         map.current.addControl(geolocate)
         // trigger geolocation on load if user gives permission
         map.current.on("load", function () {
-            geolocate.trigger()
+            if (!firstGeolocate){
+                setFirstGeolocate(true)
+                geolocate.trigger()
+            }
         })
         // after geolocate triggers on load, get new restaurant data and transform
         // current dataset
@@ -125,7 +127,6 @@ export default function Map() {
             const lat = event.coords.latitude
             const position = [lng, lat]
             restaurants = await getRestaurants(position)
-            console.log("test", restaurants)
             setSourceData()
         })
 
@@ -412,7 +413,7 @@ export default function Map() {
                 },
             })
         })
-    }, [])
+    }, [lat])
 
     function onButtonChange(clickedLayer) {
         map.current.setLayoutProperty(clickedLayer, "visibility", "visible")
@@ -474,17 +475,23 @@ export default function Map() {
         }
     }
 
+    function handleSearchSubmit(coordinates, searchTerms){
+        // await getRestaurants(coordinates, searchTerms)
+        setLng(coordinates[0])
+        setLat(coordinates[1])
+    }
+
     return (
         <div>
             <div ref={mapContainer} className="map-container" />
             {!window.localStorage.getItem("hasVisited") && (
                 <div>Display Tutorial</div>
-            )}
-            <SearchBar/>
+                )}
+            <SearchBar handleSearchSubmit={(coordinates, searchTerms) => handleSearchSubmit(coordinates, searchTerms)}/>
             <SimpleBackdrop />
             <SimpleAccordion
                 onChange={clickedLayer => onButtonChange(clickedLayer)}
-            />
+                />
         </div>
     )
 }
