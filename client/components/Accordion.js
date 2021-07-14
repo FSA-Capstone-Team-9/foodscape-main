@@ -24,7 +24,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function SimpleAccordion(props) {
     const classes = useStyles()
-    const [value, setValue] = React.useState("female")
+    const [value, setValue] = React.useState("1")
 
     const handleChange = event => {
         setValue(event.target.value)
