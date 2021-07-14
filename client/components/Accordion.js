@@ -15,6 +15,7 @@ import FormLabel from "@material-ui/core/FormLabel"
 const useStyles = makeStyles(theme => ({
     root: {
         width: "10%",
+        margin: 5,
     },
     heading: {
         fontSize: theme.typography.pxToRem(15),

@@ -64,20 +64,32 @@ export default function Map() {
             }
         })
         return geoJSONBusinesses
+        // [$,$$,$$$,$$$$]
+        // [1, 1, 0, 0]
+        //.filter((r)=>r.properties.price.length===)
         //.sort((a, b) => b.properties.price - a.properties.price)
         //.sort((a, b) => b.properties.rating - a.properties.rating)
+        //.sort((a, b) => b.properties.distance - a.properties.distance)
     }
 
     // get yelp restaurant data
-    async function getRestaurants(coordinates, searchTerms = "food") {
+    async function getRestaurants(
+        coordinates,
+        searchTerms = "food",
+        radius = 6000,
+        limit = 20,
+        sort = "best_match",
+        offset = 0
+    ) {
         try {
             const searchRequest = {
                 term: searchTerms,
                 latitude: coordinates[1],
                 longitude: coordinates[0],
-                radius: 4000,
-                limit: 20,
-                sort_by: "distance",
+                radius: 8000,
+                limit: 50,
+                offset: offset,
+                sort_by: "best_match",
             }
             const { data } = await axios.post("/api/yelp", searchRequest)
             return data
