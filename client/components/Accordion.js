@@ -14,7 +14,7 @@ import FormControl from "@material-ui/core/FormControl"
 import FormLabel from "@material-ui/core/FormLabel"
 const useStyles = makeStyles(theme => ({
     root: {
-        width: "10%",
+        width: "50%",
         margin: 5,
     },
     heading: {
