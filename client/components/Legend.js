@@ -1,5 +1,4 @@
 import React from "react";
-
 const legendComponent = {
   backgroundColor: "#fff",
   borderRadius: "3px",
@@ -13,7 +12,6 @@ const legendComponent = {
 const legendHeader = {
   margin: "0 0 10px",
 };
-
 const legendSpan = {
   borderRadius: "50%",
   display: "inline-block",
@@ -21,54 +19,161 @@ const legendSpan = {
   marginRight: "5px",
   width: "10px",
 };
-
 export default function legend(props) {
-  console.log(props.legendValue);
-  return (
-    <>
-      <div style={legendComponent}>
-        <h4 style={legendHeader}>Legend</h4>
-        <div>
-          <span
-            style={Object.assign({}, legendSpan, {
-              backgroundColor: "#00ff00",
-            })}
-          ></span>
-          4 or higher
-        </div>
-        <div>
-          <span
-            style={Object.assign({}, legendSpan, {
-              backgroundColor: "#e8eb34",
-            })}
-          ></span>
-          4 or higher
-        </div>
-        <div>
-          <span
-            style={Object.assign({}, legendSpan, {
-              backgroundColor: "#eb9c34",
-            })}
-          ></span>
-          4 or higher
-        </div>
-        <div>
-          <span
-            style={Object.assign({}, legendSpan, {
-              backgroundColor: "#eb3434",
-            })}
-          ></span>
-          4 or higher
-        </div>
-        <div>
-          <span
-            style={Object.assign({}, legendSpan, {
-              backgroundColor: "#eb3434",
-            })}
-          ></span>
-          4 or higher
-        </div>
-      </div>
-    </>
-  );
+  const value = props.legendValue;
+  console.log(typeof props.legendValue);
+  switch (value) {
+    case "1":
+      return <VizOne />;
+    case "2":
+      return <VizTwo />;
+    case "3":
+      return <VizThree />;
+    default:
+      return <VizOne />;
+  }
 }
+const VizOne = () => {
+  console.log("VizOne");
+  return (
+    <div style={legendComponent}>
+      <h4 style={legendHeader}>Legend</h4>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#00ff00",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#e8eb34",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#eb9c34",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#eb3434",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#eb3434",
+          })}
+        ></span>
+        4 or higher
+      </div>
+    </div>
+  );
+};
+const VizTwo = () => {
+  console.log("VizTwo");
+  return (
+    <div style={legendComponent}>
+      <h4 style={legendHeader}>Legend</h4>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#00ff00",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#e8eb34",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#eb9c34",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#eb3434",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#eb3434",
+          })}
+        ></span>
+        4 or higher
+      </div>
+    </div>
+  );
+};
+const VizThree = () => {
+  console.log("VizThree");
+  return (
+    <div style={legendComponent}>
+      <h4 style={legendHeader}>Legend</h4>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#00ff00",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#e8eb34",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#eb9c34",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#eb3434",
+          })}
+        ></span>
+        4 or higher
+      </div>
+      <div>
+        <span
+          style={Object.assign({}, legendSpan, {
+            backgroundColor: "#eb3434",
+          })}
+        ></span>
+        4 or higher
+      </div>
+    </div>
+  );
+};
