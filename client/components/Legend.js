@@ -1,6 +1,8 @@
 import React from "react";
+
 const legendComponent = {
   backgroundColor: "#fff",
+  fontFamily: "Arial",
   borderRadius: "3px",
   bottom: "30px",
   boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
@@ -48,6 +50,7 @@ const VizOne = () => {
   return (
     <div style={legendComponent}>
       <h4 style={legendHeader}>Legend</h4>
+      <h5>Rating</h5>
       <div>
         <span
           style={Object.assign({}, legendSpan, {
@@ -78,23 +81,16 @@ const VizOne = () => {
             backgroundColor: "#eb3434",
           })}
         ></span>
-        3.0 - 3.5
+        3.5 or lower
       </div>
-      <div>
-        <span
-          style={Object.assign({}, legendSpan, {
-            backgroundColor: "#eb3434",
-          })}
-        ></span>
-        3.0 or lower
-      </div>
+      <h5>Pricing</h5>
       <div>
         <span
           style={Object.assign({}, legendBigSpan, {
             backgroundColor: "#00ff00",
           })}
         ></span>
-        Pricing
+        Higher Price Point
       </div>
     </div>
   );
@@ -110,7 +106,7 @@ const VizTwo = () => {
             backgroundColor: "#00ff00",
           })}
         ></span>
-        4 or higher
+        $
       </div>
       <div>
         <span
@@ -118,7 +114,7 @@ const VizTwo = () => {
             backgroundColor: "#e8eb34",
           })}
         ></span>
-        4 or higher
+        $$
       </div>
       <div>
         <span
@@ -126,7 +122,7 @@ const VizTwo = () => {
             backgroundColor: "#eb9c34",
           })}
         ></span>
-        4 or higher
+        $$$
       </div>
       <div>
         <span
@@ -134,15 +130,15 @@ const VizTwo = () => {
             backgroundColor: "#eb3434",
           })}
         ></span>
-        4 or higher
+        $$$$
       </div>
       <div>
         <span
           style={Object.assign({}, legendSpan, {
-            backgroundColor: "#eb3434",
+            backgroundColor: "#808080",
           })}
         ></span>
-        4 or higher
+        Price point unknown
       </div>
     </div>
   );
@@ -152,13 +148,14 @@ const VizThree = () => {
   return (
     <div style={legendComponent}>
       <h4 style={legendHeader}>Legend</h4>
+      <h5>Rating</h5>
       <div>
         <span
           style={Object.assign({}, legendSpan, {
             backgroundColor: "#00ff00",
           })}
         ></span>
-        4 or higher
+        4.5 or higher
       </div>
       <div>
         <span
@@ -166,7 +163,7 @@ const VizThree = () => {
             backgroundColor: "#e8eb34",
           })}
         ></span>
-        4 or higher
+        4.0 - 4.5
       </div>
       <div>
         <span
@@ -174,7 +171,7 @@ const VizThree = () => {
             backgroundColor: "#eb9c34",
           })}
         ></span>
-        4 or higher
+        3.5 - 4.0
       </div>
       <div>
         <span
@@ -182,16 +179,9 @@ const VizThree = () => {
             backgroundColor: "#eb3434",
           })}
         ></span>
-        4 or higher
+        3.5 or lower
       </div>
-      <div>
-        <span
-          style={Object.assign({}, legendSpan, {
-            backgroundColor: "#eb3434",
-          })}
-        ></span>
-        4 or higher
-      </div>
+      <h5>Price Point</h5>$ - $$$$
     </div>
   );
 };
