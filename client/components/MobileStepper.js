@@ -1,41 +1,41 @@
 import React from 'react';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
 import MobileStepper from '@material-ui/core/MobileStepper';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
 import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
-
+import SwipeableViews from 'react-swipeable-views';
 const tutorialSteps = [
   {
-    label: 'Step 1',
+    label: 'You can filter by cuisine',
     imgPath:
-      '',
+      '/tutorial/firstStep.png',
   },
   {
-    label: 'Step 2',
+    label: 'Choose a location from the dropdown menu',
     imgPath:
-      '',
+      '/tutorial/secondStep.png',
   },
   {
-    label: 'Step 3',
+    label: 'Compare restaurants!',
     imgPath:
-      '',
+      '/tutorial/stepThree.png',
   },
   {
-    label: 'Step 4',
+    label: 'Choose filter options here',
     imgPath:
-      '',
+      '/tutorial/vz.png',
   },
   {
-    label: 'Step 5',
+    label: 'Choose your visualization mode',
     imgPath:
-      '',
+      '/tutorial/stepFour.png',
   },
 ];
-
-const useStyles = makeStyles((theme) => ({
+const styles = theme => ({
   root: {
     maxWidth: 400,
     flexGrow: 1,
@@ -49,55 +49,76 @@ const useStyles = makeStyles((theme) => ({
   },
   img: {
     height: 255,
+    display: 'block',
     maxWidth: 400,
     overflow: 'hidden',
-    display: 'block',
     width: '100%',
   },
-}));
-
-export default function TextMobileStepper() {
-  const classes = useStyles();
-  const theme = useTheme();
-  const [activeStep, setActiveStep] = React.useState(0);
-  const maxSteps = tutorialSteps.length;
-
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
+});
+class SwipeableTextMobileStepper extends React.Component {
+  state = {
+    activeStep: 0,
   };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
+  handleNext = () => {
+    this.setState(prevState => ({
+      activeStep: prevState.activeStep + 1,
+    }));
   };
-
-  return (
-    <div className={classes.root}>
-      <Paper square elevation={0} className={classes.header}>
-        <Typography>{tutorialSteps[activeStep].label}</Typography>
-      </Paper>
-      <img
-        className={classes.img}
-        src={tutorialSteps[activeStep].imgPath}
-        alt={tutorialSteps[activeStep].label}
-      />
-      <MobileStepper
-        steps={maxSteps}
-        position="static"
-        variant="text"
-        activeStep={activeStep}
-        nextButton={
-          <Button size="small" onClick={handleNext} disabled={activeStep === maxSteps - 1}>
-            Next
-            {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
-          </Button>
-        }
-        backButton={
-          <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
-            {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
-            Back
-          </Button>
-        }
-      />
-    </div>
-  );
+  handleBack = () => {
+    this.setState(prevState => ({
+      activeStep: prevState.activeStep - 1,
+    }));
+  };
+  handleStepChange = activeStep => {
+    this.setState({ activeStep });
+  };
+  render() {
+    const { classes, theme } = this.props;
+    const { activeStep } = this.state;
+    const maxSteps = tutorialSteps.length;
+    return (
+      <div className={classes.root}>
+        <Paper square elevation={0} className={classes.header}>
+          <Typography>{tutorialSteps[activeStep].label}</Typography>
+        </Paper>
+        <SwipeableViews
+          axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+          index={activeStep}
+          onChangeIndex={this.handleStepChange}
+          enableMouseEvents
+        >
+          {tutorialSteps.map((step, index) => (
+            <div key={step.label}>
+              {(activeStep - index) <= 2 ? (
+                <img className={classes.img} src={step.imgPath} alt={step.label} />
+              ) : null}
+            </div>
+          ))}
+        </SwipeableViews>
+        <MobileStepper
+          steps={maxSteps}
+          position="static"
+          activeStep={activeStep}
+          className={classes.mobileStepper}
+          nextButton={
+            <Button size="small" onClick={this.handleNext} disabled={activeStep === maxSteps - 1}>
+              Next
+              {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+            </Button>
+          }
+          backButton={
+            <Button size="small" onClick={this.handleBack} disabled={activeStep === 0}>
+              {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+              Back
+            </Button>
+          }
+        />
+      </div>
+    );
+  }
 }
+SwipeableTextMobileStepper.propTypes = {
+  classes: PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
+};
+export default withStyles(styles, { withTheme: true })(SwipeableTextMobileStepper);

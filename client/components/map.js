@@ -1,9 +1,9 @@
 import React, { useRef, useEffect, useState } from "react";
 
 import { TextField, Toolbar, AppBar, Button } from "@material-ui/core";
-import SimpleBackdrop from "./Backdrop";
 import SimpleAccordion from "./Accordion";
 import SearchBar from "./Search-Bar";
+import Tutorial from "./Tutorial";
 import Legend from "./Legend";
 
 import mapboxgl from "!mapbox-gl";
@@ -473,7 +473,7 @@ export default function Map() {
       <SimpleAccordion
         onChange={(clickedLayer) => onButtonChange(clickedLayer)}
       />
-      <SimpleBackdrop />
+      <Tutorial />
       <Legend legendValue={legendValue} />
     </div>
   );

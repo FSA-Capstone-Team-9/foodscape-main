@@ -53,6 +53,7 @@
     "graphql": "^15.5.1",
     "nodemon": "^2.0.9",
     "path": "^0.12.7",
+    "react-swipeable-views": "^0.14.0",
     "yelp-fusion": "^3.0.0"
   }
 }
