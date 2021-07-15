@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState } from "react"
 import { TextField, Toolbar, AppBar, Button } from "@material-ui/core"
 import SimpleAccordion from "./Accordion"
 import SearchBar from "./Search-Bar"
+import Tutorial from "./Tutorial"
 
 import mapboxgl from "!mapbox-gl"
 import axios from "axios"
@@ -510,6 +511,7 @@ export default function Map() {
             <SimpleAccordion
                 onChange={clickedLayer => onButtonChange(clickedLayer)}
             />
+            <Tutorial />
         </div>
     )
 }
