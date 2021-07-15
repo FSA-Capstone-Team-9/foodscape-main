@@ -22,7 +22,8 @@ const legendSpan = {
   width: "10px",
 };
 
-export default function legend() {
+export default function legend(props) {
+  console.log(props.legendValue);
   return (
     <>
       <div style={legendComponent}>

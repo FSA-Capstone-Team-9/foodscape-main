@@ -23,6 +23,7 @@ export default function Map() {
   const [lat, setLat] = useState(defaultLat);
   const [firstGeolocate, setFirstGeolocate] = useState(false);
   let restaurants = [];
+  const [legendValue, setLegendValue] = useState(1);
 
   // Function to transform yelp api restaurant data into a GEOJSON
   function transformJSON() {
@@ -421,6 +422,7 @@ export default function Map() {
   }, [lat]);
 
   function onButtonChange(clickedLayer) {
+    setLegendValue(clickedLayer[clickedLayer.length - 1]);
     map.current.setLayoutProperty(clickedLayer, "visibility", "visible");
     switch (clickedLayer) {
       case "restaurants-1":
@@ -472,7 +474,7 @@ export default function Map() {
         onChange={(clickedLayer) => onButtonChange(clickedLayer)}
       />
       <SimpleBackdrop />
-      <Legend />
+      <Legend legendValue={legendValue} />
     </div>
   );
 }
