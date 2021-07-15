@@ -91,7 +91,7 @@ export default function Map() {
                 radius: 8000,
                 limit: 50,
                 offset: offset,
-                sort_by: "distance",
+                sort_by: "best_match",
             }
             const { data } = await axios.post("/api/yelp", searchRequest)
             return data
