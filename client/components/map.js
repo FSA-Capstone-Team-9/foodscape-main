@@ -112,7 +112,8 @@ export default function Map() {
     useEffect(() => {
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
-            style: "mapbox://styles/huckcg/ckr12f5kk28ad18pjhrb713zo/draft",
+            // style: "mapbox://styles/huckcg/ckr12f5kk28ad18pjhrb713zo/draft",
+            style: "mapbox://styles/mapbox/light-v10",
             center: [lng, lat],
             zoom: defaultZoom,
         })
