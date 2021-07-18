@@ -48,7 +48,7 @@ export default function Map() {
       const imageUrl = stringifiedRating(business.rating);
 
       // render price in popup if price exists from yelp api
-      const renderPrice = `<h4>Price: ${business.price}</h4>`
+      const renderPrice = `<h4>Price: ${business.price}</h4>`;
 
       return {
         type: 'Feature',
@@ -61,9 +61,11 @@ export default function Map() {
                     <h2>${business.name}</h2>
                     <img src="${business.image_url}" class="popover-img"/>
                     <h3>Distance: ${distance}mi</h3>
-                    ${business.price ? renderPrice : ""}
+                    ${business.price ? renderPrice : ''}
                     <h4>Rating: <img src="/yelp/regular_${imageUrl}.png"/></h4>
-                    <div><a href="${business.url}" target="_blank"><img src="/yelp/Logo_Stroke_RGB.png" width='50px' style="float: right;" /></a></div>
+                    <div class="popover-footer">Find out more on <a href="${
+                      business.url
+                    }" target="_blank"><img src="/yelp/Logo_Stroke_RGB.png" width='50px' style="float: right;" /></a></div>
                     </div>
                     `,
 
@@ -222,7 +224,7 @@ export default function Map() {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
 
-      new mapboxgl.Popup({anchor: 'left'})
+      new mapboxgl.Popup({ anchor: 'left' })
         .setLngLat(coordinates)
         .setHTML(popoverDescription)
         .addTo(map.current);
