@@ -33,7 +33,7 @@ export default function Map() {
       if (business.price) {
         price = business.price.length;
       }
-      //convert meters to miles jackass
+      //convert meters to miles
       let meters = Math.floor(business.distance);
       let distance = (meters / 1609.344).toFixed(1);
 
@@ -47,6 +47,9 @@ export default function Map() {
       }
       const imageUrl = stringifiedRating(business.rating);
 
+      // render price in popup if price exists from yelp api
+      const renderPrice = `<h4>Price: ${business.price}</h4>`
+
       return {
         type: 'Feature',
         properties: {
@@ -58,9 +61,9 @@ export default function Map() {
                     <h2>${business.name}</h2>
                     <img src="${business.image_url}" class="popover-img"/>
                     <h3>Distance: ${distance}mi</h3>
-                    <h4>Price: ${business.price}</h4>
+                    ${business.price ? renderPrice : ""}
                     <h4>Rating: <img src="/yelp/regular_${imageUrl}.png"/></h4>
-                    <div><img src="/yelp/Logo_Stroke_RGB.png" width='50px' style="float: right;" /></div>
+                    <div><a href="${business.url}" target="_blank"><img src="/yelp/Logo_Stroke_RGB.png" width='50px' style="float: right;" /></a></div>
                     </div>
                     `,
 
