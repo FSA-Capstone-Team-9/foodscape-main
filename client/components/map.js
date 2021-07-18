@@ -59,7 +59,7 @@ export default function Map() {
           // popover formatting
           popoverDescription: `<div class="popover">
                     <h2>${business.name}</h2>
-                    <img src="${business.image_url}" class="popover-img"/>
+                    <div class="popover-image"><img src="${business.image_url}" class="popover-img"/></div>
                     <h3>Distance: ${distance}mi</h3>
                     ${business.price ? renderPrice : ''}
                     <h4>Rating: <img src="/yelp/regular_${imageUrl}.png"/></h4>
