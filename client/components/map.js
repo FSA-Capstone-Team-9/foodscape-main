@@ -1,4 +1,6 @@
 import React, { useRef, useEffect, useState } from "react"
+
+import { TextField, Toolbar, AppBar, Button } from "@material-ui/core"
 import SimpleAccordion from "./Accordion"
 import SearchBar from "./Search-Bar"
 import Tutorial from "./Tutorial"
@@ -39,6 +41,20 @@ export default function Map() {
             //convert meters to miles
             let meters = Math.floor(business.distance)
             let distance = (meters / 1609.344).toFixed(1)
+
+            // convert yelp ratings to string for image url
+            function stringifiedRating(rating) {
+                if (Number.isInteger(rating)) {
+                    return `${rating}`
+                } else {
+                    return `${rating.toString().split(".")[0]}_half`
+                }
+            }
+            const imageUrl = stringifiedRating(business.rating)
+
+            // render price in popup if price exists from yelp api
+            const renderPrice = `<h4>Price: ${business.price}</h4>`
+
             return {
                 type: "Feature",
                 properties: {
@@ -46,12 +62,19 @@ export default function Map() {
                     rating: business.rating,
 
                     // popover formatting
-                    popoverDescription: `<h2>${business.name}</h2>
-                    <img src="${business.image_url}" class="popover-img"/>
-                    <h3>Distance: ${distance}mi</h3>
-                    <h4>Price: ${business.price ? business.price : "-"}</h4>
-                    <h4>Rating: ${business.rating}</h4>
-                    `,
+                    popoverDescription: `<div class="popover">
+                            <h2>${business.name}</h2>
+                            <img src="/yelp/regular_${imageUrl}.png" />
+                            <div class="popover-image"><img src="${
+                                business.image_url
+                            }" class="popover-img"/></div>
+                            <h3>Distance: ${distance}mi</h3>
+                            ${business.price ? renderPrice : ""}
+                            <div class="popover-footer">Find out more on <a href="${
+                                business.url
+                            }" target="_blank"><img src="/yelp/Logo_Stroke_RGB.png" width='50px' style="float: right;" /></a></div>
+                            </div>
+                            `,
 
                     price: price,
                     priceString: business.price ? business.price : "-",
@@ -68,24 +91,27 @@ export default function Map() {
                 },
             }
         })
-        // return geoJSONBusinesses
         return applyOptions(geoJSONBusinesses)
-        // [$,$$,$$$,$$$$]
-        // [1, 1, 0, 0]
-        //.filter((r)=>r.properties.price.length===)
-        //.sort((a, b) => b.properties.price - a.properties.price)
-        //.sort((a, b) => b.properties.rating - a.properties.rating)
-        //.sort((a, b) => b.properties.distance - a.properties.distance)
+        // return geoJSONBusinesses
     }
     function applyOptions(array) {
         // returns array of businesses.
         // options.price == [0, 0, 0, 0]
         // options.rating == 0
         // options.distance == 5mi
+        // [$,$$,$$$,$$$$]
+        // [1, 1, 0, 0]
+        //.filter((r)=>r.properties.price.length===)
+        //.sort((a, b) => b.properties.price - a.properties.price)
+        //.sort((a, b) => b.properties.rating - a.properties.rating)
+        //.sort((a, b) => b.properties.distance - a.properties.distance)
 
         let priceCheck = options.price.every(function (e) {
             return e == "0"
         })
+
+        //Filters data based on options
+        console.log(priceCheck)
         return array.filter(restaurant => {
             if (
                 priceCheck ||
@@ -128,6 +154,7 @@ export default function Map() {
             })
         }
     }
+
     useEffect(() => {
         console.log("rendering map here")
         // Create new map
@@ -170,7 +197,7 @@ export default function Map() {
                 "#eb3434",
                 "#eb3434",
                 "#eb9c34",
-                "#e8eb34",
+                "#84ff00",
                 "#00ff00",
             ]
             // test layer 1
@@ -202,7 +229,9 @@ export default function Map() {
                         3,
                         40,
                         4,
+                        50,
                         5,
+                        6,
                     ],
                     "circle-stroke-width": 1,
                     "circle-stroke-color": "#000000",
@@ -313,12 +342,15 @@ export default function Map() {
         })
         map.current.addControl(scale)
         scale.setUnit("imperial")
-
-        // On Map load
     }, [lat])
 
     useEffect(() => {
         // Mouse pointer functionality - onmouseenter, change cursor
+        setSourceData()
+    }, [restaurants, options])
+
+    // Map Interaction Hook
+    useEffect(() => {
         map.current.on("mouseenter", "restaurants-1", function () {
             map.current.getCanvas().style.cursor = "pointer"
         })
@@ -345,7 +377,7 @@ export default function Map() {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
             }
 
-            new mapboxgl.Popup()
+            new mapboxgl.Popup({ anchor: "left" })
                 .setLngLat(coordinates)
                 .setHTML(popoverDescription)
                 .addTo(map.current)
@@ -361,13 +393,12 @@ export default function Map() {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
             }
 
-            new mapboxgl.Popup()
+            new mapboxgl.Popup({ anchor: "left" })
                 .setLngLat(coordinates)
                 .setHTML(popoverDescription)
                 .addTo(map.current)
         })
-        setSourceData()
-    }, [restaurants])
+    })
 
     //TODO onVizChange, onPriceChange, onRatingChange, onDistanceChange
     function onButtonChange(clickedLayer) {
@@ -405,7 +436,10 @@ export default function Map() {
     }
 
     function onPriceChange(prices) {
-        setSourceData()
+        setOptions({
+            ...options,
+            price: prices,
+        })
     }
     async function handleSearchSubmit(coordinates, searchTerms) {
         const data = await getRestaurants(coordinates, searchTerms)
