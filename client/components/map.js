@@ -382,7 +382,7 @@ export default function Map() {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
             }
 
-            new mapboxgl.Popup({ anchor: "left" })
+            new mapboxgl.Popup({ anchor: "left", closeButton: false })
                 .setLngLat(coordinates)
                 .setHTML(popoverDescription)
                 .addTo(map.current)
@@ -398,7 +398,7 @@ export default function Map() {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
             }
 
-            new mapboxgl.Popup({ anchor: "left" })
+            new mapboxgl.Popup({ anchor: "left", closeButton: false })
                 .setLngLat(coordinates)
                 .setHTML(popoverDescription)
                 .addTo(map.current)
