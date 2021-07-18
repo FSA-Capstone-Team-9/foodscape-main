@@ -54,12 +54,14 @@ export default function Map() {
           rating: business.rating,
 
           // popover formatting
-          popoverDescription: `<h2>${business.name}</h2>
+          popoverDescription: `<div class="popover">
+                    <h2>${business.name}</h2>
                     <img src="${business.image_url}" class="popover-img"/>
                     <h3>Distance: ${distance}mi</h3>
                     <h4>Price: ${business.price}</h4>
-                    <h4>Rating: ${business.rating} <img src="/yelp/regular_${imageUrl}.png"/></h4>
+                    <h4>Rating: <img src="/yelp/regular_${imageUrl}.png"/></h4>
                     <div><img src="/yelp/Logo_Stroke_RGB.png" width='50px' style="float: right;" /></div>
+                    </div>
                     `,
 
           price: price,
@@ -217,7 +219,7 @@ export default function Map() {
         coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
       }
 
-      new mapboxgl.Popup()
+      new mapboxgl.Popup({anchor: 'left'})
         .setLngLat(coordinates)
         .setHTML(popoverDescription)
         .addTo(map.current);
