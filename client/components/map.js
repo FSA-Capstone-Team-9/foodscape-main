@@ -28,6 +28,11 @@ export default function Map() {
     const mapContainer = useRef(null)
     const map = useRef(null)
     let [restaurants, setRestaurants] = useState([])
+    let [marker, setMarker] = useState(
+        new mapboxgl.Marker({
+            color: "#d32323",
+        })
+    )
 
     // Function to transform yelp api restaurant data into a GEOJSON
     function transformJSON() {
@@ -441,6 +446,7 @@ export default function Map() {
             price: prices,
         })
     }
+    
     async function handleSearchSubmit(coordinates, searchTerms) {
         const data = await getRestaurants(coordinates, searchTerms)
         setRestaurants(data)
@@ -450,12 +456,7 @@ export default function Map() {
             center: coordinates,
         })
 
-        new mapboxgl.Marker({
-            id: "location",
-            color: "#d32323",
-        })
-            .setLngLat(coordinates)
-            .addTo(map.current)
+        marker.setLngLat(coordinates).addTo(map.current)
     }
 
     return (
