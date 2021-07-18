@@ -1,6 +1,4 @@
 import React, { useRef, useEffect, useState } from "react"
-
-import { TextField, Toolbar, AppBar, Button } from "@material-ui/core"
 import SimpleAccordion from "./Accordion"
 import SearchBar from "./Search-Bar"
 import Tutorial from "./Tutorial"
@@ -24,16 +22,22 @@ export default function Map() {
     const [firstGeolocate, setFirstGeolocate] = useState(false)
     let restaurants = []
     const [legendValue, setLegendValue] = useState(1)
+    const [options, setOptions] = useState({
+        rating: 0,
+        price: [],
+        distance: 5,
+    })
 
     // Function to transform yelp api restaurant data into a GEOJSON
     function transformJSON() {
+        //options here
         const geoJSONBusinesses = restaurants.map(business => {
             //Map over businesses here
             let price = 0
             if (business.price) {
                 price = business.price.length
             }
-            //convert meters to miles jackass
+            //convert meters to miles
             let meters = Math.floor(business.distance)
             let distance = (meters / 1609.344).toFixed(1)
             return {
@@ -46,12 +50,12 @@ export default function Map() {
                     popoverDescription: `<h2>${business.name}</h2>
                     <img src="${business.image_url}" class="popover-img"/>
                     <h3>Distance: ${distance}mi</h3>
-                    <h4>Price: ${business.price}</h4>
+                    <h4>Price: ${business.price ? business.price : "-"}</h4>
                     <h4>Rating: ${business.rating}</h4>
                     `,
 
                     price: price,
-                    priceString: business.price,
+                    priceString: business.price ? business.price : "-",
                     id: business.id,
                     distance: business.distance,
                     url: business.url,
@@ -66,6 +70,7 @@ export default function Map() {
             }
         })
         return geoJSONBusinesses
+        // return applyOptions(geoJSONBusinesses)
         // [$,$$,$$$,$$$$]
         // [1, 1, 0, 0]
         //.filter((r)=>r.properties.price.length===)
@@ -73,16 +78,22 @@ export default function Map() {
         //.sort((a, b) => b.properties.rating - a.properties.rating)
         //.sort((a, b) => b.properties.distance - a.properties.distance)
     }
-
+    function applyOptions(array) {
+        // returns array of businesses.
+        // options.price == [0, 0, 0, 0]
+        // options.rating == 0
+        // options.distance == 5mi
+        return array.filter(restaurant => {
+            if (
+                options.distance >= restaurant.properties.distance &&
+                restaurant.properties.rating >= options.rating
+            ) {
+                return restaurant
+            }
+        })
+    }
     // get yelp restaurant data
-    async function getRestaurants(
-        coordinates,
-        searchTerms = "food",
-        radius = 6000,
-        limit = 20,
-        sort = "best_match",
-        offset = 0
-    ) {
+    async function getRestaurants(coordinates, searchTerms = "food") {
         try {
             const searchRequest = {
                 term: searchTerms,
@@ -90,7 +101,7 @@ export default function Map() {
                 longitude: coordinates[0],
                 radius: 8000,
                 limit: 50,
-                offset: offset,
+                offset: 0,
                 sort_by: "best_match",
             }
             const { data } = await axios.post("/api/yelp", searchRequest)
@@ -144,26 +155,11 @@ export default function Map() {
             setSourceData()
         })
 
-        // Use this to determine window size
-        // console.log("width:", window.innerWidth)
-        // console.log("height:", window.innerHeight)
-
         // search bar with geocoder
         const searchBar = new MapboxGeocoder({
             accessToken: mapboxgl.accessToken,
             mapboxgl: mapboxgl,
         })
-
-        // default Mapbox searchbar
-        // // Searchbar control
-        // map.current.addControl(searchBar)
-        // searchBar.on("result", async function (event) {
-        //     restaurants = await getRestaurants(event.result.center)
-        //     // After searching, set new source data
-        //     setSourceData()
-        //     // event.result = search bar results including full address and coordinates
-        //     // event.result.center = [longitude, latitude]
-        // })
 
         // Fullscreen control
         map.current.addControl(new mapboxgl.FullscreenControl())
@@ -179,14 +175,8 @@ export default function Map() {
         map.current.addControl(scale)
         scale.setUnit("imperial")
 
-        const layers = {
-            layers: ["restaurants-1", "restaurants-2", "restaurants-3"],
-        }
         // Mouse pointer functionality - onmouseenter, change cursor
         map.current.on("mouseenter", "restaurants-1", function () {
-            map.current.getCanvas().style.cursor = "pointer"
-        })
-        map.current.on("mouseenter", "restaurants-2", function () {
             map.current.getCanvas().style.cursor = "pointer"
         })
         map.current.on("mouseenter", "restaurants-3", function () {
@@ -197,30 +187,11 @@ export default function Map() {
         map.current.on("mouseleave", "restaurants-1", function () {
             map.current.getCanvas().style.cursor = ""
         })
-        map.current.on("mouseleave", "restaurants-2", function () {
-            map.current.getCanvas().style.cursor = ""
-        })
         map.current.on("mouseleave", "restaurants-3", function () {
             map.current.getCanvas().style.cursor = ""
         })
         // OnClick functionality - open popup
         map.current.on("click", "restaurants-1", function (e) {
-            var coordinates = e.features[0].geometry.coordinates.slice()
-            var popoverDescription = e.features[0].properties.popoverDescription
-
-            // Ensure that if the map is zoomed out such that multiple
-            // copies of the feature are visible, the popup appears
-            // over the copy being pointed to.
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
-            }
-
-            new mapboxgl.Popup()
-                .setLngLat(coordinates)
-                .setHTML(popoverDescription)
-                .addTo(map.current)
-        })
-        map.current.on("click", "restaurants-2", function (e) {
             var coordinates = e.features[0].geometry.coordinates.slice()
             var popoverDescription = e.features[0].properties.popoverDescription
 
@@ -331,56 +302,17 @@ export default function Map() {
                 },
             })
 
-            // test layer 2
-            map.current.addLayer({
-                id: "restaurants-2",
-                type: "circle",
-                source: "restaurants",
-                // minzoom: 14,
-                paint: {
-                    "circle-color": [
-                        "match",
-                        ["get", "price"],
-                        1,
-                        colors[4],
-                        2,
-                        colors[3],
-                        3,
-                        colors[2],
-                        4,
-                        colors[1],
-                        /* other */ "#000000",
-                    ],
-
-                    "circle-radius": [
-                        "step",
-                        ["get", "rating"],
-                        10,
-                        3,
-                        20,
-                        3.5,
-                        30,
-                        4,
-                        40,
-                        4.5,
-                        50,
-                        5,
-                        5,
-                    ],
-                    "circle-stroke-width": 1,
-                    "circle-stroke-color": "#000000",
-                    "circle-opacity": 0.45,
-                },
-                layout: {
-                    visibility: "none",
-                },
-            })
-
             // test layer 3
             map.current.addLayer({
                 id: "restaurants-3",
                 type: "circle",
                 source: "restaurants",
+                transition: {
+                    "fill-opacity-transition": {
+                        duration: 300,
+                        delay: 0,
+                    },
+                },
                 // minzoom: 14,
                 paint: {
                     "circle-color": [
@@ -403,7 +335,7 @@ export default function Map() {
                         ],
                     },
                     "circle-stroke-width": 1,
-                    "circle-stroke-color": "#000000",
+                    "circle-stroke-color": "#808080",
                     "circle-opacity": 0.45,
                 },
                 layout: {
@@ -430,33 +362,12 @@ export default function Map() {
         })
     }, [lat])
 
+    //TODO onVizChange, onPriceChange, onRatingChange, onDistanceChange
     function onButtonChange(clickedLayer) {
         setLegendValue(clickedLayer[clickedLayer.length - 1])
         map.current.setLayoutProperty(clickedLayer, "visibility", "visible")
         switch (clickedLayer) {
             case "restaurants-1":
-                map.current.setLayoutProperty(
-                    "restaurants-2",
-                    "visibility",
-                    "none"
-                )
-                map.current.setLayoutProperty(
-                    "restaurants-3",
-                    "visibility",
-                    "none"
-                )
-                map.current.setLayoutProperty(
-                    "restaurant-price",
-                    "visibility",
-                    "none"
-                )
-                break
-            case "restaurants-2":
-                map.current.setLayoutProperty(
-                    "restaurants-1",
-                    "visibility",
-                    "none"
-                )
                 map.current.setLayoutProperty(
                     "restaurants-3",
                     "visibility",
@@ -469,11 +380,6 @@ export default function Map() {
                 )
                 break
             case "restaurants-3":
-                map.current.setLayoutProperty(
-                    "restaurants-2",
-                    "visibility",
-                    "none"
-                )
                 map.current.setLayoutProperty(
                     "restaurants-1",
                     "visibility",
@@ -498,6 +404,32 @@ export default function Map() {
         map.current.jumpTo({
             center: coordinates,
         })
+        var markerHeight = 50,
+            markerRadius = 10,
+            linearOffset = 25
+        var popupOffsets = {
+            top: [0, 0],
+            "top-left": [0, 0],
+            "top-right": [0, 0],
+            bottom: [0, -markerHeight],
+            "bottom-left": [
+                linearOffset,
+                (markerHeight - markerRadius + linearOffset) * -1,
+            ],
+            "bottom-right": [
+                -linearOffset,
+                (markerHeight - markerRadius + linearOffset) * -1,
+            ],
+            left: [markerRadius, (markerHeight - markerRadius) * -1],
+            right: [-markerRadius, (markerHeight - markerRadius) * -1],
+        }
+        new mapboxgl.Marker({
+            offset: popupOffsets,
+            id: "location",
+            color: "#d32323",
+        })
+            .setLngLat(coordinates)
+            .addTo(map.current)
     }
 
     return (

@@ -5,13 +5,15 @@ import AccordionSummary from "@material-ui/core/AccordionSummary"
 import AccordionDetails from "@material-ui/core/AccordionDetails"
 import Typography from "@material-ui/core/Typography"
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore"
-import Button from "@material-ui/core/Button"
 
+import ToggleButton from "@material-ui/lab/ToggleButton"
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup"
 import Radio from "@material-ui/core/Radio"
 import RadioGroup from "@material-ui/core/RadioGroup"
 import FormControlLabel from "@material-ui/core/FormControlLabel"
 import FormControl from "@material-ui/core/FormControl"
 import FormLabel from "@material-ui/core/FormLabel"
+import { Switch } from "@material-ui/core"
 const useStyles = makeStyles(theme => ({
     root: {
         width: "100%",
@@ -31,7 +33,11 @@ export default function SimpleAccordion(props) {
         setValue(event.target.value)
         props.onChange(`restaurants-${event.target.value}`)
     }
+    const [prices, setPrices] = React.useState(() => [])
 
+    const handlePriceOptions = (event, newPrices) => {
+        setPrices(newPrices)
+    }
     return (
         <div className={classes.root} style={{ zIndex: "10" }}>
             <Accordion>
@@ -50,8 +56,9 @@ export default function SimpleAccordion(props) {
                     <Button>Filter 2</Button> */}
 
                     {/* Radio */}
+
                     <FormControl component="fieldset">
-                        <FormLabel component="legend">Tests</FormLabel>
+                        <FormLabel component="legend"></FormLabel>
                         <RadioGroup
                             aria-label="tests"
                             name="tests"
@@ -64,16 +71,30 @@ export default function SimpleAccordion(props) {
                                 label="Version 1"
                             />
                             <FormControlLabel
-                                value="2"
-                                control={<Radio />}
-                                label="Version 2"
-                            />
-                            <FormControlLabel
                                 value="3"
                                 control={<Radio />}
                                 label="Version 3"
                             />
                         </RadioGroup>
+                        <ToggleButtonGroup
+                            label="Price"
+                            aria-label="text alignment"
+                            value={prices}
+                            onChange={handlePriceOptions}
+                        >
+                            <ToggleButton value="1" aria-label="$">
+                                $
+                            </ToggleButton>
+                            <ToggleButton value="2" aria-label="$$">
+                                $$
+                            </ToggleButton>
+                            <ToggleButton value="3" aria-label="$$$">
+                                $$$
+                            </ToggleButton>
+                            <ToggleButton value="4" aria-label="$$$$">
+                                $$$$
+                            </ToggleButton>
+                        </ToggleButtonGroup>
                     </FormControl>
                 </AccordionDetails>
             </Accordion>
