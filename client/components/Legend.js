@@ -33,7 +33,6 @@ const legendBigSpan = {
 };
 export default function legend(props) {
   const value = props.legendValue;
-  console.log(typeof props.legendValue);
   switch (value) {
     case "1":
       return <VizOne />;
@@ -46,7 +45,6 @@ export default function legend(props) {
   }
 }
 const VizOne = () => {
-  console.log("VizOne");
   return (
     <div style={legendComponent}>
       <h4 style={legendHeader}>Legend</h4>
@@ -96,7 +94,6 @@ const VizOne = () => {
   );
 };
 const VizTwo = () => {
-  console.log("VizTwo");
   return (
     <div style={legendComponent}>
       <h4 style={legendHeader}>Legend</h4>
@@ -144,7 +141,6 @@ const VizTwo = () => {
   );
 };
 const VizThree = () => {
-  console.log("VizThree");
   return (
     <div style={legendComponent}>
       <h4 style={legendHeader}>Legend</h4>

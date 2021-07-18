@@ -28,15 +28,16 @@ const useStyles = makeStyles(theme => ({
 export default function SimpleAccordion(props) {
     const classes = useStyles()
     const [value, setValue] = React.useState("1")
+    const [prices, setPrices] = React.useState(() => [])
 
     const handleChange = event => {
         setValue(event.target.value)
         props.onChange(`restaurants-${event.target.value}`)
     }
-    const [prices, setPrices] = React.useState(() => [])
 
     const handlePriceOptions = (event, newPrices) => {
         setPrices(newPrices)
+        props.onPriceChange(newPrices)
     }
     return (
         <div className={classes.root} style={{ zIndex: "10" }}>
@@ -49,14 +50,6 @@ export default function SimpleAccordion(props) {
                     <Typography className={classes.heading}>Filters</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                    {/* <Button onClick={() => props.onChange("restaurants-1")}>
-                        Filter 1
-                    </Button>
-
-                    <Button>Filter 2</Button> */}
-
-                    {/* Radio */}
-
                     <FormControl component="fieldset">
                         <FormLabel component="legend"></FormLabel>
                         <RadioGroup
@@ -76,26 +69,26 @@ export default function SimpleAccordion(props) {
                                 label="Version 3"
                             />
                         </RadioGroup>
-                        <ToggleButtonGroup
-                            label="Price"
-                            aria-label="text alignment"
-                            value={prices}
-                            onChange={handlePriceOptions}
-                        >
-                            <ToggleButton value="1" aria-label="$">
-                                $
-                            </ToggleButton>
-                            <ToggleButton value="2" aria-label="$$">
-                                $$
-                            </ToggleButton>
-                            <ToggleButton value="3" aria-label="$$$">
-                                $$$
-                            </ToggleButton>
-                            <ToggleButton value="4" aria-label="$$$$">
-                                $$$$
-                            </ToggleButton>
-                        </ToggleButtonGroup>
                     </FormControl>
+                    <ToggleButtonGroup
+                        label="Price"
+                        aria-label="text alignment"
+                        value={prices}
+                        onChange={handlePriceOptions}
+                    >
+                        <ToggleButton value="1" aria-label="$">
+                            $
+                        </ToggleButton>
+                        <ToggleButton value="2" aria-label="$$">
+                            $$
+                        </ToggleButton>
+                        <ToggleButton value="3" aria-label="$$$">
+                            $$$
+                        </ToggleButton>
+                        <ToggleButton value="4" aria-label="$$$$">
+                            $$$$
+                        </ToggleButton>
+                    </ToggleButtonGroup>
                 </AccordionDetails>
             </Accordion>
         </div>

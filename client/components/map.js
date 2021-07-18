@@ -14,24 +14,23 @@ export default function Map() {
     const defaultLng = -73.9855
     const defaultLat = 40.758
     const defaultZoom = 15
-
-    const mapContainer = useRef(null)
-    const map = useRef(null)
     const [lng, setLng] = useState(defaultLng)
     const [lat, setLat] = useState(defaultLat)
     const [firstGeolocate, setFirstGeolocate] = useState(false)
-    let restaurants = []
     const [legendValue, setLegendValue] = useState(1)
     const [options, setOptions] = useState({
         rating: 0,
-        price: [],
+        price: ["0", "0", "0", "0"],
         distance: 5,
     })
+    const mapContainer = useRef(null)
+    const map = useRef(null)
+    let [restaurants, setRestaurants] = useState([])
 
     // Function to transform yelp api restaurant data into a GEOJSON
     function transformJSON() {
         //options here
-        const geoJSONBusinesses = restaurants.map(business => {
+        const geoJSONBusinesses = Array.from(restaurants).map(business => {
             //Map over businesses here
             let price = 0
             if (business.price) {
@@ -69,8 +68,8 @@ export default function Map() {
                 },
             }
         })
-        return geoJSONBusinesses
-        // return applyOptions(geoJSONBusinesses)
+        // return geoJSONBusinesses
+        return applyOptions(geoJSONBusinesses)
         // [$,$$,$$$,$$$$]
         // [1, 1, 0, 0]
         //.filter((r)=>r.properties.price.length===)
@@ -83,10 +82,14 @@ export default function Map() {
         // options.price == [0, 0, 0, 0]
         // options.rating == 0
         // options.distance == 5mi
+
+        let priceCheck = options.price.every(function (e) {
+            return e == "0"
+        })
         return array.filter(restaurant => {
             if (
-                options.distance >= restaurant.properties.distance &&
-                restaurant.properties.rating >= options.rating
+                priceCheck ||
+                options.price.includes(restaurant.properties.price.toString())
             ) {
                 return restaurant
             }
@@ -106,6 +109,7 @@ export default function Map() {
             }
             const { data } = await axios.post("/api/yelp", searchRequest)
             return data
+            // return data
         } catch (error) {
             console.log(error)
         }
@@ -113,118 +117,26 @@ export default function Map() {
 
     // Set data source to include new restaurant data
     function setSourceData() {
-        let newData = transformJSON()
-        map.current.getSource("restaurants").setData({
-            type: "FeatureCollection",
-            features: newData,
-        })
-    }
+        // Check to see if source is created during initial render
+        // On intial render, restaurants source is undefined - correct functionality
+        if (map.current.getSource("restaurants")) {
+            let newData = transformJSON()
 
+            map.current.getSource("restaurants").setData({
+                type: "FeatureCollection",
+                features: newData,
+            })
+        }
+    }
     useEffect(() => {
+        console.log("rendering map here")
+        // Create new map
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
             style: "mapbox://styles/huckcg/ckr12f5kk28ad18pjhrb713zo/draft",
             center: [lng, lat],
             zoom: defaultZoom,
         })
-
-        // geolocation button on map
-        const geolocate = new mapboxgl.GeolocateControl({
-            positionOptions: {
-                enableHighAccuracy: true,
-            },
-            trackUserLocation: true,
-            fitBoundsOptions: { duration: 0 },
-            showAccuracyCircle: false,
-        })
-        map.current.addControl(geolocate)
-        // trigger geolocation on load if user gives permission
-        map.current.on("load", function () {
-            if (!firstGeolocate) {
-                setFirstGeolocate(true)
-                geolocate.trigger()
-            }
-        })
-        // after geolocate triggers on load, get new restaurant data and transform
-        // current dataset
-        geolocate.once("geolocate", async function (event) {
-            const lng = event.coords.longitude
-            const lat = event.coords.latitude
-            const position = [lng, lat]
-            restaurants = await getRestaurants(position)
-            setSourceData()
-        })
-
-        // search bar with geocoder
-        const searchBar = new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl,
-        })
-
-        // Fullscreen control
-        map.current.addControl(new mapboxgl.FullscreenControl())
-
-        // Navigation control
-        map.current.addControl(new mapboxgl.NavigationControl())
-
-        // Scale legend
-        var scale = new mapboxgl.ScaleControl({
-            maxWidth: 150,
-            unit: "imperial",
-        })
-        map.current.addControl(scale)
-        scale.setUnit("imperial")
-
-        // Mouse pointer functionality - onmouseenter, change cursor
-        map.current.on("mouseenter", "restaurants-1", function () {
-            map.current.getCanvas().style.cursor = "pointer"
-        })
-        map.current.on("mouseenter", "restaurants-3", function () {
-            map.current.getCanvas().style.cursor = "pointer"
-        })
-
-        // Change it back to a pointer when it leaves.
-        map.current.on("mouseleave", "restaurants-1", function () {
-            map.current.getCanvas().style.cursor = ""
-        })
-        map.current.on("mouseleave", "restaurants-3", function () {
-            map.current.getCanvas().style.cursor = ""
-        })
-        // OnClick functionality - open popup
-        map.current.on("click", "restaurants-1", function (e) {
-            var coordinates = e.features[0].geometry.coordinates.slice()
-            var popoverDescription = e.features[0].properties.popoverDescription
-
-            // Ensure that if the map is zoomed out such that multiple
-            // copies of the feature are visible, the popup appears
-            // over the copy being pointed to.
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
-            }
-
-            new mapboxgl.Popup()
-                .setLngLat(coordinates)
-                .setHTML(popoverDescription)
-                .addTo(map.current)
-        })
-        map.current.on("click", "restaurants-3", function (e) {
-            var coordinates = e.features[0].geometry.coordinates.slice()
-            var popoverDescription = e.features[0].properties.popoverDescription
-
-            // Ensure that if the map is zoomed out such that multiple
-            // copies of the feature are visible, the popup appears
-            // over the copy being pointed to.
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
-            }
-
-            new mapboxgl.Popup()
-                .setLngLat(coordinates)
-                .setHTML(popoverDescription)
-                .addTo(map.current)
-        })
-
-        // On Map load
         map.current.on("load", function () {
             // Add source data
             map.current.addSource("restaurants", {
@@ -234,7 +146,6 @@ export default function Map() {
                     features: transformJSON(),
                 },
             })
-
             // Comparison Expressions for ratings
             const rating1 = ["<", ["get", "rating"], 3]
             const rating2 = [
@@ -360,7 +271,103 @@ export default function Map() {
                 },
             })
         })
+        // geolocation button on map
+        const geolocate = new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true,
+            },
+            trackUserLocation: true,
+            fitBoundsOptions: { duration: 0 },
+            showAccuracyCircle: false,
+        })
+        map.current.addControl(geolocate)
+        // trigger geolocation on load if user gives permission
+        map.current.on("load", function () {
+            if (!firstGeolocate) {
+                console.log("triggered")
+                setFirstGeolocate(true)
+                geolocate.trigger()
+            }
+        })
+        // after geolocate triggers on load, get new restaurant data and transform
+        // current dataset
+        geolocate.once("geolocate", async function (event) {
+            const lng = event.coords.longitude
+            const lat = event.coords.latitude
+            const position = [lng, lat]
+            const data = await getRestaurants(position)
+            setRestaurants(data)
+            console.log(map.current.getSource("restaurants"))
+        })
+
+        // Fullscreen control
+        map.current.addControl(new mapboxgl.FullscreenControl())
+
+        // Navigation control
+        map.current.addControl(new mapboxgl.NavigationControl())
+
+        // Scale legend
+        var scale = new mapboxgl.ScaleControl({
+            maxWidth: 150,
+            unit: "imperial",
+        })
+        map.current.addControl(scale)
+        scale.setUnit("imperial")
+
+        // On Map load
     }, [lat])
+
+    useEffect(() => {
+        // Mouse pointer functionality - onmouseenter, change cursor
+        map.current.on("mouseenter", "restaurants-1", function () {
+            map.current.getCanvas().style.cursor = "pointer"
+        })
+        map.current.on("mouseenter", "restaurants-3", function () {
+            map.current.getCanvas().style.cursor = "pointer"
+        })
+
+        // Change it back to a pointer when it leaves.
+        map.current.on("mouseleave", "restaurants-1", function () {
+            map.current.getCanvas().style.cursor = ""
+        })
+        map.current.on("mouseleave", "restaurants-3", function () {
+            map.current.getCanvas().style.cursor = ""
+        })
+        // OnClick functionality - open popup
+        map.current.on("click", "restaurants-1", function (e) {
+            var coordinates = e.features[0].geometry.coordinates.slice()
+            var popoverDescription = e.features[0].properties.popoverDescription
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+            }
+
+            new mapboxgl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(popoverDescription)
+                .addTo(map.current)
+        })
+        map.current.on("click", "restaurants-3", function (e) {
+            var coordinates = e.features[0].geometry.coordinates.slice()
+            var popoverDescription = e.features[0].properties.popoverDescription
+
+            // Ensure that if the map is zoomed out such that multiple
+            // copies of the feature are visible, the popup appears
+            // over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
+            }
+
+            new mapboxgl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(popoverDescription)
+                .addTo(map.current)
+        })
+        setSourceData()
+    }, [restaurants])
 
     //TODO onVizChange, onPriceChange, onRatingChange, onDistanceChange
     function onButtonChange(clickedLayer) {
@@ -397,34 +404,19 @@ export default function Map() {
         }
     }
 
-    async function handleSearchSubmit(coordinates, searchTerms) {
-        restaurants = await getRestaurants(coordinates, searchTerms)
-        // After searching, set new source data
+    function onPriceChange(prices) {
         setSourceData()
+    }
+    async function handleSearchSubmit(coordinates, searchTerms) {
+        const data = await getRestaurants(coordinates, searchTerms)
+        setRestaurants(data)
+        // After searching, set new source data
+
         map.current.jumpTo({
             center: coordinates,
         })
-        var markerHeight = 50,
-            markerRadius = 10,
-            linearOffset = 25
-        var popupOffsets = {
-            top: [0, 0],
-            "top-left": [0, 0],
-            "top-right": [0, 0],
-            bottom: [0, -markerHeight],
-            "bottom-left": [
-                linearOffset,
-                (markerHeight - markerRadius + linearOffset) * -1,
-            ],
-            "bottom-right": [
-                -linearOffset,
-                (markerHeight - markerRadius + linearOffset) * -1,
-            ],
-            left: [markerRadius, (markerHeight - markerRadius) * -1],
-            right: [-markerRadius, (markerHeight - markerRadius) * -1],
-        }
+
         new mapboxgl.Marker({
-            offset: popupOffsets,
             id: "location",
             color: "#d32323",
         })
@@ -445,6 +437,7 @@ export default function Map() {
             />
             <SimpleAccordion
                 onChange={clickedLayer => onButtonChange(clickedLayer)}
+                onPriceChange={prices => onPriceChange(prices)}
             />
             <Tutorial />
             <Legend legendValue={legendValue} />
