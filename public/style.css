@@ -1,10 +1,10 @@
 /* Roboto light 300 font */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
 
 body {
     margin: 0px;
     padding: 0;
-    width: 35%
+    width: 35%;
 }
 
 .map-container {
@@ -29,7 +29,7 @@ body {
 }
 
 .popover {
-    font-family: 'Roboto', sans-serif;
+    font-family: "Roboto", sans-serif;
 }
 
 .popover-image {
@@ -37,7 +37,7 @@ body {
     justify-content: center;
 }
 
-.popover-footer{
+.popover-footer {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -47,7 +47,7 @@ body {
     position: relative;
     background: floralwhite;
     border-radius: 10px;
-    box-shadow: 0 1px 2px rgb(0 0 0 / 10%);
+    box-shadow: 0 10px 10px rgb(0 0 0 / 10%);
     padding: 10px 10px 10px;
     pointer-events: auto;
 }
