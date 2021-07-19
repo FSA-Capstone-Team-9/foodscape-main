@@ -21,7 +21,7 @@ export default function Map() {
     const [firstGeolocate, setFirstGeolocate] = useState(false)
     const [legendValue, setLegendValue] = useState(1)
     const [options, setOptions] = useState({
-        rating: 0,
+        rating: [2.5, 5],
         price: ["0", "0", "0", "0"],
         distance: 5,
     })
@@ -33,6 +33,7 @@ export default function Map() {
             color: "#d32323",
         })
     )
+    let [popup, setPopup] = useState(new mapboxgl.Popup({ anchor: "left" }))
 
     // Function to transform yelp api restaurant data into a GEOJSON
     function transformJSON() {
@@ -116,11 +117,15 @@ export default function Map() {
         })
 
         //Filters data based on options
-        console.log(priceCheck)
+
         return array.filter(restaurant => {
             if (
-                priceCheck ||
-                options.price.includes(restaurant.properties.price.toString())
+                (priceCheck ||
+                    options.price.includes(
+                        restaurant.properties.price.toString()
+                    )) &&
+                restaurant.properties.rating >= options.rating[0] &&
+                restaurant.properties.rating <= options.rating[1]
             ) {
                 return restaurant
             }
@@ -205,7 +210,7 @@ export default function Map() {
                 "#84ff00",
                 "#00ff00",
             ]
-            // test layer 1
+            // viz layer 1
             map.current.addLayer({
                 id: "restaurants-1",
                 type: "circle",
@@ -239,11 +244,11 @@ export default function Map() {
                         6,
                     ],
                     "circle-stroke-width": 1,
-                    "circle-stroke-color": "#000000",
+                    "circle-stroke-color": "#808080",
                     "circle-opacity": 0.45,
                 },
                 layout: {
-                    visibility: "visible",
+                    visibility: "none",
                 },
             })
 
@@ -284,7 +289,7 @@ export default function Map() {
                     "circle-opacity": 0.45,
                 },
                 layout: {
-                    visibility: "none",
+                    visibility: "visible",
                 },
             })
 
@@ -301,7 +306,7 @@ export default function Map() {
                         "Arial Unicode MS Bold",
                     ],
                     "text-size": 16,
-                    visibility: "none",
+                    visibility: "visible",
                 },
             })
         })
@@ -381,8 +386,8 @@ export default function Map() {
             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
             }
-
-            new mapboxgl.Popup({ anchor: "left" })
+            setPopup()
+            popup
                 .setLngLat(coordinates)
                 .setHTML(popoverDescription)
                 .addTo(map.current)
@@ -397,8 +402,7 @@ export default function Map() {
             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
             }
-
-            new mapboxgl.Popup({ anchor: "left" })
+            popup
                 .setLngLat(coordinates)
                 .setHTML(popoverDescription)
                 .addTo(map.current)
@@ -412,6 +416,11 @@ export default function Map() {
         switch (clickedLayer) {
             case "restaurants-1":
                 map.current.setLayoutProperty(
+                    "restaurants-1",
+                    "visibility",
+                    "visible"
+                )
+                map.current.setLayoutProperty(
                     "restaurants-3",
                     "visibility",
                     "none"
@@ -423,6 +432,11 @@ export default function Map() {
                 )
                 break
             case "restaurants-3":
+                map.current.setLayoutProperty(
+                    "restaurants-3",
+                    "visibility",
+                    "visible"
+                )
                 map.current.setLayoutProperty(
                     "restaurants-1",
                     "visibility",
@@ -440,13 +454,22 @@ export default function Map() {
         }
     }
 
+    // Filter Option Handler Functions
     function onPriceChange(prices) {
         setOptions({
             ...options,
             price: prices,
         })
     }
-    
+    function onRatingChange(rating) {
+        if (rating[0] != options.rating[0] || rating[1] != options.rating[1]) {
+            setOptions({
+                ...options,
+                rating,
+            })
+        }
+    }
+
     async function handleSearchSubmit(coordinates, searchTerms) {
         const data = await getRestaurants(coordinates, searchTerms)
         setRestaurants(data)
@@ -473,6 +496,7 @@ export default function Map() {
             <SimpleAccordion
                 onChange={clickedLayer => onButtonChange(clickedLayer)}
                 onPriceChange={prices => onPriceChange(prices)}
+                onRatingChange={rating => onRatingChange(rating)}
             />
             <Tutorial />
             <Legend legendValue={legendValue} />
