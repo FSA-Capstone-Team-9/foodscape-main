@@ -33,7 +33,9 @@ export default function Map() {
             color: "#d32323",
         })
     )
-    let [popup, setPopup] = useState(new mapboxgl.Popup({ anchor: "left" }))
+    let [popup, setPopup] = useState(
+        new mapboxgl.Popup({ anchor: "left", closeButton: false })
+    )
 
     // Function to transform yelp api restaurant data into a GEOJSON
     function transformJSON() {
@@ -386,7 +388,6 @@ export default function Map() {
             while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
                 coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360
             }
-            setPopup()
             popup
                 .setLngLat(coordinates)
                 .setHTML(popoverDescription)
