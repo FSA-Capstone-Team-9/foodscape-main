@@ -87,7 +87,12 @@ export default function SearchBar(props) {
         }
     }
     async function onSearchChange(event) {
-        setLocation(event.target.value)
+            // typing and clicking autocomplete location values are stored in different places
+            if (event.type === 'change'){
+                setLocation(event.target.value)
+            } else if (event.type === 'click'){
+                setLocation(event.target.innerText)
+            }
         try {
             const result = await axios.get(
                 `https://api.tiles.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
