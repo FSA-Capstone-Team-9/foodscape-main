@@ -21,11 +21,11 @@ export default function legend(props) {
   const value = props.legendValue;
   switch (value) {
     case "1":
-      return <VizThree />;
+      return <VizOne />;
     case "2":
       return <VizTwo />;
     case "3":
-      return <VizOne />;
+      return <VizThree />;
     default:
       return <VizThree />;
   }
@@ -33,8 +33,8 @@ export default function legend(props) {
 const VizOne = () => {
   return (
     <div className="legendComponent">
-      <h4>Legend</h4>
-      <h5>Rating</h5>
+      <h4 className="legendHeader">Legend</h4>
+      <h5 className="legendHeader">Rating</h5>
       <div>
         <span
           style={Object.assign({}, legendSpan, {
@@ -49,7 +49,7 @@ const VizOne = () => {
             backgroundColor: "#e8eb34",
           })}
         ></span>
-        4.0 - 4.5
+        4.0 - 4.4
       </div>
       <div>
         <span
@@ -57,7 +57,7 @@ const VizOne = () => {
             backgroundColor: "#eb9c34",
           })}
         ></span>
-        3.5 - 4.0
+        3.5 - 3.9
       </div>
       <div>
         <span
@@ -65,9 +65,9 @@ const VizOne = () => {
             backgroundColor: "#eb3434",
           })}
         ></span>
-        3.5 or lower
+        3.4 or lower
       </div>
-      <h5>Pricing</h5>
+      <h5 className="legendHeader">Pricing</h5>
       <div>
         <span
           style={Object.assign({}, legendBigSpan, {
@@ -145,7 +145,7 @@ const VizThree = () => {
             backgroundColor: "#e8eb34",
           })}
         ></span>
-        4.0 - 4.5
+        4.0 - 4.4
       </div>
       <div>
         <span
@@ -153,7 +153,7 @@ const VizThree = () => {
             backgroundColor: "#eb9c34",
           })}
         ></span>
-        3.5 - 4.0
+        3.5 - 3.9
       </div>
       <div>
         <span
@@ -161,7 +161,7 @@ const VizThree = () => {
             backgroundColor: "#eb3434",
           })}
         ></span>
-        3.5 or lower
+        3.4 or lower
       </div>
       <h5 className="legendHeader">Price Point</h5>$ - $$$$
     </div>
