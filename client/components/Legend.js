@@ -1,19 +1,5 @@
 import React from "react";
 
-const legendComponent = {
-  backgroundColor: "#fff",
-  fontFamily: "Arial",
-  borderRadius: "3px",
-  bottom: "30px",
-  boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
-  padding: "10px",
-  position: "absolute",
-  right: "10px",
-  zIndex: 1,
-};
-const legendHeader = {
-  margin: "0 0 10",
-};
 const legendSpan = {
   borderRadius: "50%",
   display: "inline-block",
@@ -35,19 +21,19 @@ export default function legend(props) {
   const value = props.legendValue;
   switch (value) {
     case "1":
-      return <VizOne />;
+      return <VizThree />;
     case "2":
       return <VizTwo />;
     case "3":
-      return <VizThree />;
-    default:
       return <VizOne />;
+    default:
+      return <VizThree />;
   }
 }
 const VizOne = () => {
   return (
-    <div style={legendComponent}>
-      <h4 style={legendHeader}>Legend</h4>
+    <div className="legendComponent">
+      <h4>Legend</h4>
       <h5>Rating</h5>
       <div>
         <span
@@ -95,8 +81,8 @@ const VizOne = () => {
 };
 const VizTwo = () => {
   return (
-    <div style={legendComponent}>
-      <h4 style={legendHeader}>Legend</h4>
+    <div className="legendComponent">
+      <h4 className="legendHeader">Legend</h4>
       <div>
         <span
           style={Object.assign({}, legendSpan, {
@@ -142,9 +128,9 @@ const VizTwo = () => {
 };
 const VizThree = () => {
   return (
-    <div style={legendComponent}>
-      <h4 style={legendHeader}>Legend</h4>
-      <h5>Rating</h5>
+    <div className="legendComponent">
+      <h4 className="legendHeader">Legend</h4>
+      <h5 className="legendHeader">Rating</h5>
       <div>
         <span
           style={Object.assign({}, legendSpan, {
@@ -177,7 +163,7 @@ const VizThree = () => {
         ></span>
         3.5 or lower
       </div>
-      <h5>Price Point</h5>$ - $$$$
+      <h5 className="legendHeader">Price Point</h5>$ - $$$$
     </div>
   );
 };
