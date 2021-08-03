@@ -1,10 +1,16 @@
 # Foodscape
 
+## Deployment
+
 Heroku Deployment: https://t9-foodscape.herokuapp.com/
 
 ## Description
 
-Foodscape is a restaurant finder visualization. Tech: Javascript, React, Express, MapboxGL, Yelp API, Material UI, NodeJS
+Foodscape is a restaurant finder visualization developed as a capstone project for Full Stack Academy. 
+
+Members: Andrew Hsu, Joshua Johnson, John Lee, Dylan Poyser
+
+Tech: Javascript, React, Express, MapboxGL, Yelp API, Material UI, NodeJS
 
 ## How To Use
 
